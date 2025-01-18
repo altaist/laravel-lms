@@ -12,3 +12,4 @@ Route::apiResource('credits', CreditController::class);
 Route::get('users/{user}/credits', [CreditController::class, 'getUserCredits']);
 Route::get('reasons/{reason}/credits', [CreditController::class, 'getByReason']);
 Route::get('credits/creditable/{type}/{id}', [CreditController::class, 'getByCreditable']);
+Route::post('/register-without-email', [App\Http\Controllers\Auth\CustomRegisterController::class, 'register']);
