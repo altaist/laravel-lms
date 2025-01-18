@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Activity;
+use App\Models\User;
 use Carbon\Carbon;
 
 class ActivityService extends BaseService
@@ -52,5 +53,37 @@ class ActivityService extends BaseService
     public function getActivityUsers(int $activityId)
     {
         return Activity::findOrFail($activityId)->users;
+    }
+
+    public function getTeamActivities(int $teamId)
+    {
+        return Activity::where('team_id', $teamId)
+            ->with(['user', 'students'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+    }
+
+    public function getActivityDetails(int $activityId)
+    {
+        $activity = Activity::with(['user', 'homeworks' => function($query) {
+                $query->with(['student', 'answers']);
+            }])
+            ->findOrFail($activityId);
+        
+        $teamStudents = User::whereHas('teams', function($query) use ($activity) {
+                $query->where('id', $activity->team_id);
+            })
+            ->whereHas('role', function($query) {
+                $query->where('slug', 'student');
+            })
+            ->with(['homeworks' => function($query) use ($activityId) {
+                $query->where('activity_id', $activityId);
+            }])
+            ->get();
+
+        return [
+            'activity' => $activity,
+            'teamStudents' => $teamStudents,
+        ];
     }
 } 

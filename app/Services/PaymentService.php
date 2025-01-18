@@ -82,4 +82,14 @@ class PaymentService extends BaseService
     {
         return $this->getPaymentsByPeriod('month');
     }
+
+    public function getTeamPayments(int $teamId)
+    {
+        return Payment::whereHas('user.teams', function ($query) use ($teamId) {
+            $query->where('teams.id', $teamId);
+        })
+        ->with(['user', 'teams'])
+        ->orderBy('created_at', 'desc')
+        ->get();
+    }
 } 

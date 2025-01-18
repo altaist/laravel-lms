@@ -13,49 +13,75 @@ class TeacherController extends BaseController
     public function lk()
     {
         $teamService = TeamService::make();
-        $teamsData = $teamService->getAllTeams();
-        $studentsData = $teamService->getAllTeamUsers();
+        $teams = $teamService->getAllTeams();
+        $users = $teamService->getAllTeamUsers();
 
         $paymentService = PaymentService::make();
-        $paymentData = $paymentService->getAllPayments();
+        $payments = $paymentService->getMonthlyPayments();
 
         $activityService = ActivityService::make();
-        $activityData = $activityService->getAllActivities();
+        $activities = $activityService->getAllActivities();
 
-        $data = [
-            "teams" => $teamsData,
-            "students" => $studentsData,
-            "activities" => $activityData,
-            "payments" => $paymentData,
-        ];
-        return $this->inertia('Wellcome', $data);
+        return $this->inertia('Wellcome', [
+            'teams' => $teams,
+            'users' => $users,
+            'activities' => $activities,
+            'payments' => $payments,
+        ]);
     }
 
     public function allTeams()
     {
-        $teamsService = TeamService::make();
-        $teamsData = $teamsService->getAllTeams();
+        $teamService = TeamService::make();
+        $teams = $teamService->getAllTeams();
 
-        $data = [
-            "teams" => $teamsData,
-        ];
-
-        return $this->inertia('Teacher/Lk', $data);
+        return $this->inertia('Teacher/Lk', [
+            'teams' => $teams,
+        ]);
     }
 
     public function allStudents()
     {
-        $studentService = StudentService::make();
-        $studentsData = $studentService->getAllStudents();
-        $data = ["students" => $studentsData];
-        return $this->inertia('Teacher/Students', $data);
+        $teamService = TeamService::make();
+        $teams = $teamService->getAllTeams();
+        $users = $teamService->getAllTeamUsers();
+
+        return $this->inertia('Teacher/TeamsAndUsers', [
+            'teams' => $teams,
+            'users' => $users
+        ]);
     }
 
     public function allLessons()
     {
         $activityService = ActivityService::make();
-        $activityData = $activityService->getAllActivities();
-        $data = ["activities" => $activityData];
-        return $this->inertia('Teacher/Lessons', $data);
+        $activities = $activityService->getAllActivities();
+        
+        return $this->inertia('Teacher/Lessons', [
+            'activities' => $activities
+        ]);
+    }
+
+
+    public function teamDetails(int $teamId)
+    {
+        $teamService = TeamService::make();
+        $team = $teamService->getTeamById($teamId);
+        $users = $teamService->getTeamUsers($teamId);
+
+        $activityService = ActivityService::make();
+        $activities = $activityService->getTeamActivities($teamId);
+
+        $paymentService = PaymentService::make();
+        $payments = $paymentService->getTeamPayments($teamId);
+
+        return $this->inertia('Teacher/TeamDetails', [
+            'team' => $team,
+            'users' => $users,
+            'activities' => $activities,
+            'payments' => $payments
+        ]);
+
+        
     }
 }
