@@ -14,6 +14,7 @@ return new class extends Migration
             $table->foreignId('topic_id')->constrained();
             $table->foreignId('type_id')->constrained();
             $table->json('content');
+            $table->timestamp('due_day')->nullable();
             $table->timestamps();
         });
     }
