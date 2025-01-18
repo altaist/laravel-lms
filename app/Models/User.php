@@ -54,4 +54,49 @@ class User extends Authenticatable
             '' => 'object',
         ];
     }
+
+    public function activities()
+    {
+        return $this->belongsToMany(Activity::class)
+            ->withPivot('attached_at')
+            ->withTimestamps();
+    }
+
+    public function teams()
+    {
+        return $this->belongsToMany(Team::class)
+            ->withTimestamps();
+    }
+
+    public function payments()
+    {
+        return $this->hasMany(Payment::class);
+    }
+
+    public function authoredPayments()
+    {
+        return $this->hasMany(Payment::class, 'author_id');
+    }
+
+    public function tasks(): BelongsToMany
+    {
+        return $this->belongsToMany(Task::class, 'user_tasks')
+            ->withPivot(['answer', 'result'])
+            ->withTimestamps();
+    }
+
+    public function addresses()
+    {
+        return $this->morphMany(Address::class, 'addressable');
+    }
+
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
+
+    public function companies()
+    {
+        return $this->belongsToMany(Company::class);
+    }
 }
