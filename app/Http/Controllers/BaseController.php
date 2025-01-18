@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Foundation\Auth\User;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Routing\Controller as BaseRoutingController;
 use Illuminate\Support\Facades\Auth;
+use Inertia\Inertia;
 
 abstract class BaseController extends BaseRoutingController
 {
@@ -20,6 +21,11 @@ abstract class BaseController extends BaseRoutingController
 
     public function responseData($data, $status = 200)
     {
-        return response($data, $status);
+        return response($data, status: $status);
+    }
+
+    public function inertia(string $componentName, array $data = [])
+    {
+        return Inertia::render($componentName, ["data" => $data]);
     }
 }
