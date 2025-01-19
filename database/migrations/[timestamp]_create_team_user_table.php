@@ -12,6 +12,7 @@ class CreateTeamUserTable extends Migration
             $table->id();
             $table->foreignId('team_id')->constrained()->onDelete('cascade');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('role_id')->nullable()->constrained()->onDelete('set null');
             $table->timestamps();
             
             $table->unique(['team_id', 'user_id']);
