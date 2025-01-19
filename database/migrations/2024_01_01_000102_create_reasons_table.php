@@ -8,19 +8,16 @@ return new class extends Migration
 {
     public function up()
     {
-        Schema::create('coins', function (Blueprint $table) {
+        Schema::create('reasons', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('short_name');
-            $table->string('code');
-            $table->string('icon');
-            $table->boolean('is_virtual')->default(true);
+            $table->text('description')->nullable();
             $table->timestamps();
         });
     }
 
     public function down()
     {
-        Schema::dropIfExists('coins');
+        Schema::dropIfExists('reasons');
     }
-}; 
+};
