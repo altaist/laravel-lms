@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Activity;
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Collection;
 
 class ActivityService extends BaseService
 {
@@ -55,11 +56,16 @@ class ActivityService extends BaseService
         return Activity::findOrFail($activityId)->users;
     }
 
-    public function getTeamActivities(int $teamId)
+    /**
+     * Получить список активностей команды
+     * 
+     * @param int $teamId
+     * @return Collection
+     */
+    public function getTeamActivities(int $teamId): Collection
     {
         return Activity::where('team_id', $teamId)
-            ->with(['user', 'students'])
-            ->orderBy('created_at', 'desc')
+            ->orderBy('starting_at', 'desc')
             ->get();
     }
 
@@ -85,5 +91,21 @@ class ActivityService extends BaseService
             'activity' => $activity,
             'teamStudents' => $teamStudents,
         ];
+    }
+
+    /**
+     * Получить текущий актуальный activity
+     * 
+     * @param int $teamId ID команды
+     * @return Activity|null
+     */
+    public function getCurrentActivity(int $teamId): ?Activity
+    {
+        $now = now();
+        
+        return Activity::where('team_id', $teamId)
+            ->where('starting_at', '<=', $now)
+            ->whereRaw('DATE_ADD(starting_at, INTERVAL duration MINUTE) > ?', [$now])
+            ->first();
     }
 } 

@@ -15,6 +15,7 @@ return new class extends Migration
             $table->json('info')->nullable();
             $table->timestamp('starting_at')->nullable();
             $table->timestamp('started_at')->nullable();
+            $table->integer('duration')->comment('Продолжительность в минутах');
             $table->timestamps();
         });
     }
