@@ -12,7 +12,7 @@ class CoinSeeder extends Seeder
         Coin::create([
             'id' => 1,
             'name' => 'Рубль',
-            'shor_tname' => 'р',
+            'short_name' => 'р',
             'code' => 'rub',
             'icon' => '',
             'is_virtual' => false
