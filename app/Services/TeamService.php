@@ -85,6 +85,6 @@ class TeamService extends BaseService
      */
     public function getAllTeamUsers()
     {
-        return User::whereHas('teams')->get();
+        return User::whereHas('teams')->with('teams')->get();
     }
 } 
