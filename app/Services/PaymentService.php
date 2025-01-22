@@ -10,7 +10,15 @@ class PaymentService extends BaseService
 {
     public function create(array $data): Payment
     {
-        return Payment::create($data);
+        return Payment::create([
+            'user_id' => $data['user_id'],
+            'author_id' => $data['author_id'],
+            'coin_id' => $data['coin_id'],
+            'amount' => $data['amount'],
+            'description' => $data['description'] ?? null,
+            'pay_from' => $data['pay_from'],
+            'payment_at' => $data['payment_at']
+        ]);
     }
 
     public function update(Payment $payment, array $data): bool

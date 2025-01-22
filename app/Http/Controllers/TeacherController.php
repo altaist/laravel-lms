@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\Request;
 use App\Services\TeamService;
 use App\Services\StudentService;
@@ -14,7 +15,8 @@ class TeacherController extends BaseController
     {
         $teamService = TeamService::make();
         $teams = $teamService->getAllTeams();
-        $users = $teamService->getAllTeamUsers();
+        //$users = $teamService->getAllTeamUsers();
+        $users = User::all();
 
         $paymentService = PaymentService::make();
         $payments = $paymentService->getMonthlyPayments();
@@ -22,9 +24,12 @@ class TeacherController extends BaseController
         $activityService = ActivityService::make();
         $activities = $activityService->getAllActivities();
 
-        return $this->inertia('Wellcome', [
+        $teacher = ['name' => 'John Doe'];
+
+        return $this->inertia('Lk/LkTeacher', [
+            'teacher' => $teacher,
             'teams' => $teams,
-            'users' => $users,
+            'students' => $users,
             'activities' => $activities,
             'payments' => $payments,
         ]);
@@ -82,6 +87,6 @@ class TeacherController extends BaseController
             'payments' => $payments
         ]);
 
-        
+
     }
 }
