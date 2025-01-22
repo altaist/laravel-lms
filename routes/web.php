@@ -28,6 +28,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/lk/teacher', [TeacherController::class, 'lk'])->name('teacher.lk');
     Route::get('/teacher/students/{studentId}', [TeacherController::class, 'studentDetails'])
         ->name('teacher.student.details');
+    Route::get('/teacher/payments', [TeacherController::class, 'payments'])
+        ->name('teacher.payments');
 });
 
 require __DIR__.'/auth.php';

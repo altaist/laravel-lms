@@ -127,8 +127,9 @@
           class="full-width"
           color="brown"
           stack
-          label="Отчеты"
-          icon="fa fa-chart-bar"
+          label="Платежи"
+          icon="fa fa-money-bill-alt"
+          @click="router.visit(route('teacher.payments'))"
         />
       </div>
     </div>
@@ -155,6 +156,7 @@
 
 <script setup>
 import { ref } from 'vue'
+import { router } from '@inertiajs/vue3'
 import NewStudentDialog from '@/modules/lms/Components/lk/teacher/NewStudentDialog.vue'
 import TransferStudentDialog from '@/modules/lms/Components/lk/teacher/TransferStudentDialog.vue'
 import NewPaymentDialog from '@/modules/lms/Components/lk/teacher/NewPaymentDialog.vue'

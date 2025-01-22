@@ -100,4 +100,14 @@ class PaymentService extends BaseService
         ->orderBy('created_at', 'desc')
         ->get();
     }
+
+    public function getTeamsPayments(array $teamIds)
+    {
+        return Payment::whereHas('user.teams', function ($query) use ($teamIds) {
+            $query->whereIn('teams.id', $teamIds);
+        })
+        ->with(['user'])
+        ->orderBy('payment_at', 'desc')
+        ->get();
+    }
 } 

@@ -8,6 +8,8 @@ use App\Services\TeamService;
 use App\Services\StudentService;
 use App\Services\PaymentService;
 use App\Services\ActivityService;
+use Illuminate\Support\Facades\Auth;
+use App\Services\UserService;
 
 class TeacherController extends BaseController
 {
@@ -97,6 +99,26 @@ class TeacherController extends BaseController
 
         return $this->inertia('Lk/StudentDetails', [
             'student' => $student
+        ]);
+    }
+
+    public function payments()
+    {
+        $teacher = Auth::user();
+        $teamService = TeamService::make();
+        $teams = $teamService->getAllTeams();
+        $teamIds = $teams->pluck('id')->toArray();
+        
+        $paymentService = PaymentService::make();
+        $payments = $paymentService->getTeamsPayments($teamIds);
+        
+        $students = $teamService->getTeamStudents($teamIds);
+
+        return inertia('Lk/TeacherPayments', [
+            'teacher' => $teacher,
+            'teams' => $teams,
+            'payments' => $payments,
+            'students' => $students,
         ]);
     }
 }

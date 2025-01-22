@@ -87,4 +87,11 @@ class TeamService extends BaseService
     {
         return User::whereHas('teams')->with('teams')->get();
     }
+
+    public function getTeamStudents(array $teamIds)
+    {
+        return User::whereHas('teams', function ($query) use ($teamIds) {
+            $query->whereIn('teams.id', $teamIds);
+        })->get();
+    }
 } 
