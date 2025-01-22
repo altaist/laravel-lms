@@ -5,7 +5,6 @@
     :left-btn-go-back="true"
 
   >
-
     <!-- Панель с именем преподавателя -->
     <div class="text-h5 q-my-xl text-center">
       {{ teacher.name }}

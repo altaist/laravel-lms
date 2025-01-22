@@ -25,9 +25,9 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::post('/payments', [PaymentController::class, 'store'])->name('payments.store');
-    Route::get('/lk/teacher', [TeacherController::class, 'lk'])->name('teacher.lk');});
-
-
-
+    Route::get('/lk/teacher', [TeacherController::class, 'lk'])->name('teacher.lk');
+    Route::get('/teacher/students/{studentId}', [TeacherController::class, 'studentDetails'])
+        ->name('teacher.student.details');
+});
 
 require __DIR__.'/auth.php';
