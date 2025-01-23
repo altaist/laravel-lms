@@ -1,8 +1,7 @@
 <template>
-  <page-layout 
+  <page-layout-home 
     title="ПРИЛОЖЕНИЕ"
     footer-text="Контакты"
-    :left-btn-go-back="true"
 
   >
     <!-- Панель с именем преподавателя -->
@@ -151,7 +150,7 @@
         </q-card-section>
       </q-card>
     </q-dialog>
-  </page-layout>
+  </page-layout-home>
 </template>
 
 <script setup>

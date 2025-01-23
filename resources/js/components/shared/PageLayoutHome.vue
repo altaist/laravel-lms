@@ -56,14 +56,15 @@ const props = defineProps({
 
     leftBtnIcon: {
         type: String,
-        default: "fa-solid fa-arrow-left"
+        default: "fa-solid fa-home"
     },
     leftBtnRoute: {
-        type: String
+        type: String,
+        default: ''
     },
     leftBtnGoBack: {
         type: Boolean,
-        default: true
+        default: false
     },
     rightBtnIcon: {
         type: String,

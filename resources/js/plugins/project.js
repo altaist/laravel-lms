@@ -1,5 +1,6 @@
 
 import PageLayout from '@/components/shared/PageLayout.vue';
+import PageLayoutHome from '@/components/shared/PageLayoutHome.vue';
 import PageHeader from '@/components/shared/PageHeader.vue';
 import PageFooter from '@/components/shared/PageFooter.vue';
 import PageSection from '@/components/shared/PageSection.vue';
@@ -14,6 +15,7 @@ export const ProjectPlugin = {
 
 
         app.component("page-layout", PageLayout);
+        app.component("page-layout-home", PageLayoutHome);
         app.component("page-header", PageHeader);
         app.component("page-title", PageTitle);
         app.component("page-footer", PageFooter);
