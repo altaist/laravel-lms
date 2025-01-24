@@ -52,75 +52,16 @@
         class="q-mb-md"
       />
 
-      <!-- Список платежей -->
-      <q-list bordered separator>
-        <q-item
-          v-for="payment in filteredPayments"
-          :key="payment.id"
-          clickable
-          @click="showPaymentDetails(payment)"
-        >
-          <q-item-section>
-            <q-item-label>{{ payment.user.name }}</q-item-label>
-            <q-item-label caption>
-              {{ payment.amount }} ₽ - {{ payment.pay_from }}
-            </q-item-label>
-          </q-item-section>
-          <q-item-section side>
-            {{ formatDateShort(payment.payment_at) }}
-          </q-item-section>
-        </q-item>
-      </q-list>
-
-      <!-- Сообщение, если платежей нет -->
-      <div v-if="filteredPayments.length === 0" class="text-center q-pa-md">
-        Платежи не найдены
-      </div>
+      <!-- Заменяем список платежей на новый компонент -->
+      <payments-list :payments="filteredPayments" />
     </div>
-
-    <!-- Диалог с деталями платежа -->
-    <q-dialog v-model="showDialog" persistent :max-width="'90vw'" :width="'90vw'">
-      <q-card>
-        <q-card-section class="row items-center">
-          <div class="text-h6">Информация о платеже</div>
-          <q-space />
-          <q-btn icon="close" flat round dense v-close-popup />
-        </q-card-section>
-
-        <q-card-section v-if="selectedPayment">
-          <div class="q-gutter-y-md">
-            <div class="row q-col-gutter-md">
-              <div class="col-12 col-sm-6">
-                <div class="text-subtitle2">Ученик</div>
-                <div>{{ selectedPayment.user.name }}</div>
-              </div>
-              <div class="col-12 col-sm-6">
-                <div class="text-subtitle2">Сумма</div>
-                <div>{{ selectedPayment.amount }} ₽</div>
-              </div>
-              <div class="col-12 col-sm-6">
-                <div class="text-subtitle2">Дата платежа</div>
-                <div>{{ formatDate(selectedPayment.payment_at) }}</div>
-              </div>
-              <div class="col-12 col-sm-6">
-                <div class="text-subtitle2">Способ оплаты</div>
-                <div>{{ selectedPayment.pay_from }}</div>
-              </div>
-              <div class="col-12" v-if="selectedPayment.description">
-                <div class="text-subtitle2">Описание</div>
-                <div>{{ selectedPayment.description }}</div>
-              </div>
-            </div>
-          </div>
-        </q-card-section>
-      </q-card>
-    </q-dialog>
   </page-layout>
 </template>
 
 <script setup>
 import { ref, computed } from 'vue'
 import { date } from 'quasar'
+import PaymentsList from '@/modules/lms/Components/payments/PaymentsList.vue'
 
 const props = defineProps({
   payments: {

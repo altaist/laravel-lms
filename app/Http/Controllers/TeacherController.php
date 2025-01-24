@@ -96,9 +96,15 @@ class TeacherController extends BaseController
     {
         $studentService = StudentService::make();
         $student = $studentService->getStudentWithTeams($studentId);
-
+        $teams = $studentService->getStudentWithTeams($studentId);
+        $activities = $studentService->getActivities($studentId);
+        $payments = $studentService->getPayments($studentId);
+        
         return $this->inertia('Lk/StudentDetails', [
-            'student' => $student
+            'student' => $student,
+            'teams' => $student['teams'],
+            'activities' => $student['activities'],
+            'payments' => $student['payments']
         ]);
     }
 
@@ -114,7 +120,7 @@ class TeacherController extends BaseController
         
         $students = $teamService->getTeamStudents($teamIds);
 
-        return inertia('Lk/TeacherPayments', [
+        return inertia('Lk/AllPayments', [
             'teacher' => $teacher,
             'teams' => $teams,
             'payments' => $payments,

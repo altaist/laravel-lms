@@ -59,8 +59,7 @@ class User extends Authenticatable
     public function activities()
     {
         return $this->belongsToMany(Activity::class)
-            ->withPivot('attached_at')
-            ->withTimestamps();
+            ->withPivot('attached_at');
     }
 
     public function teams()
