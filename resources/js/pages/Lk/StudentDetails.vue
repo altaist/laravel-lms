@@ -3,7 +3,21 @@
     title="Студент"
   >
     <div class="q-pa-md">
-      <div class="text-h5 q-mb-md">{{ student.name }}</div>
+      <q-card class="q-mb-md">
+        <q-card-section>
+          <div class="row items-center">
+            <div class="col">
+              <div class="text-h5">{{ student.name }}</div>
+              <div class="text-caption">{{ student.email }}</div>
+            </div>
+            <div class="col-auto">
+              <balance-chip
+                :balance="getBalance(student)"
+              />
+            </div>
+          </div>
+        </q-card-section>
+      </q-card>
       
       <q-tabs v-model="tab" class="q-mb-md">
         <q-tab name="teams" label="Команды" />
@@ -85,6 +99,7 @@
 <script setup>
 import { Head } from '@inertiajs/vue3'
 import { ref, onMounted } from 'vue'
+import BalanceChip from '@/Components/BalanceChip.vue'
 
 const props = defineProps({
   student: Object,
@@ -94,6 +109,11 @@ const props = defineProps({
 })
 
 const tab = ref('teams')
+
+const getBalance = (student) => {
+  const balance = student.balances?.find(b => b.coin_id === 2)
+  return balance ? balance.amount : 0
+}
 
 const toggleTeamMembership = async (teamId, isSelected) => {
   await fetch(route('api.student.toggle-team', { team_id: teamId, student_id: props.student.id }), {

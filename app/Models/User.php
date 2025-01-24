@@ -8,6 +8,8 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Models\Balance;
 
 class User extends Authenticatable
 {
@@ -83,5 +85,13 @@ class User extends Authenticatable
         return $this->belongsToMany(Task::class, 'user_tasks')
             ->withPivot(['answer', 'result'])
             ->withTimestamps();
+    }
+
+    /**
+     * Получить балансы пользователя
+     */
+    public function balances(): HasMany
+    {
+        return $this->hasMany(Balance::class);
     }
 }

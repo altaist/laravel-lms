@@ -41,6 +41,12 @@
           {{ student.teams?.map(team => team.name).join(', ') || 'Нет групп' }}
         </q-item-label>
       </q-item-section>
+      
+      <q-item-section side>
+        <balance-chip
+          :balance="getBalance(student)"
+        />
+      </q-item-section>
     </q-item>
   </q-list>
 
@@ -89,6 +95,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { router } from '@inertiajs/vue3'
+import BalanceChip from '@/Components/BalanceChip.vue'
 
 const props = defineProps({
   students: {
@@ -146,5 +153,10 @@ const openStudentDetails = () => {
 }
     router.visit(route('teacher.student.details', { studentId: selectedStudent.value.id }))
   }
+}
+
+const getBalance = (student) => {
+  const balance = student.balances?.find(b => b.coin_id === 2)
+  return balance ? balance.amount : 0
 }
 </script> 

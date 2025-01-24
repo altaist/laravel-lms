@@ -6,9 +6,14 @@ use App\Models\Activity;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\DB;
 
 class ActivityService extends BaseService
 {
+    public function __construct(
+        private readonly BalanceService $balanceService
+    ) {}
+
     public function getAllActivities()
     {
         return Activity::with(['team', 'users'])->get();
@@ -107,5 +112,21 @@ class ActivityService extends BaseService
             ->where('starting_at', '<=', $now)
             ->whereRaw('DATE_ADD(starting_at, INTERVAL duration MINUTE) > ?', [$now])
             ->first();
+    }
+
+    public function completeActivity(Activity $activity, User $user, int $coinId, int $creditValue)
+    {
+        return DB::transaction(function () use ($activity, $user, $coinId, $creditValue) {
+            // ... какая-то логика ...
+
+            $this->balanceService->updateCreditAndBalance(
+                creditable: $activity,
+                user: $user,
+                coinId: $coinId,
+                creditValue: $creditValue
+            );
+
+            // ... остальная логика ...
+        });
     }
 } 

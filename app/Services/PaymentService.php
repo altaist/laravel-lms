@@ -5,9 +5,15 @@ namespace App\Services;
 use App\Models\Payment;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
+use App\Services\BalanceService;
+use Illuminate\Support\Facades\DB;
 
 class PaymentService extends BaseService
 {
+    public function __construct(
+        private readonly BalanceService $balanceService
+    ) {}
+
     public function create(array $data): Payment
     {
         return Payment::create([
@@ -109,5 +115,24 @@ class PaymentService extends BaseService
         ->with(['user.teams'])
         ->orderBy('payment_at', 'desc')
         ->get();
+    }
+
+    /**
+     * Создать платеж и обновить баланс пользователя
+     */
+    public function processPayment(array $data): Payment
+    {
+        return DB::transaction(function () use ($data) {
+            $payment = $this->create($data);
+            
+            $this->balanceService->updateCreditAndBalance(
+                creditable: $payment,
+                user: $payment->user,
+                coinId: 2,
+                creditValue: $data['credit_amount']
+            );
+            
+            return $payment;
+        });
     }
 } 

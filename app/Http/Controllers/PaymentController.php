@@ -8,27 +8,25 @@ use Illuminate\Support\Facades\Auth;
 
 class PaymentController extends Controller
 {
-    protected $paymentService;
-
-    public function __construct(PaymentService $paymentService)
-    {
-        $this->paymentService = $paymentService;
-    }
+    public function __construct(
+        private readonly PaymentService $paymentService
+    ) {}
 
     public function store(Request $request)
     {
         $validated = $request->validate([
             'user_id' => 'required|exists:users,id',
             'amount' => 'required|numeric|min:0',
+            'credit_amount' => 'required|integer|min:0',
             'pay_from' => 'required|in:cash,card',
             'description' => 'nullable|string',
-            'payment_at' => 'required|date'
+            'payment_at' => 'required|date',
+            'coin_id' => 'required|exists:coins,id'
         ]);
 
         $validated['author_id'] = Auth::id();
-        $validated['coin_id'] = 1; // Предполагается, что у вас есть базовая валюта с ID 1
 
-        $payment = $this->paymentService->create($validated);
+        $payment = $this->paymentService->processPayment($validated);
 
         return response()->json($payment, 201);
     }

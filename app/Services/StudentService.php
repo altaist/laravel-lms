@@ -13,7 +13,7 @@ class StudentService
 
     public function getStudentWithTeams($studentId)
     {
-        $student = User::with(['teams', 'activities', 'payments'])->findOrFail($studentId);
+        $student = User::with(['teams', 'activities', 'payments', 'balances'])->findOrFail($studentId);
         return $student;
         return [
             'id' => $student->id,

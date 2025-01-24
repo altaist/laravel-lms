@@ -22,6 +22,13 @@
           :rules="[val => !!val || 'Обязательное поле']"
         />
 
+        <q-input
+          v-model.number="form.credit_amount"
+          type="number"
+          label="Кол-во занятий *"
+          :rules="[val => !!val || 'Обязательное поле']"
+        />
+
         <q-checkbox
           v-model="form.pay_from"
           label="Безнал"
@@ -67,6 +74,7 @@ const $q = useQuasar()
 const form = ref({
   user: null,
   amount: 4000,
+  coin_amount: 8,
   pay_from: 'cash',
   description: '',
   payment_at: new Date().toISOString().slice(0, 16)
@@ -83,7 +91,8 @@ const onSubmit = async () => {
   try {
     const formData = {
       ...form.value,
-      user_id: Number(form.value.user.value)
+      user_id: Number(form.value.user.value),
+      coin_id: 1  // Добавляем coin_id если он фиксированный, иначе нужно добавить селект
     }
     
     await axios.post(route('payments.store'), formData)

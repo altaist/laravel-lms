@@ -28,13 +28,17 @@ class TeacherController extends BaseController
 
         $teacher = ['name' => 'John Doe'];
 
-        return $this->inertia('Lk/LkTeacher', [
+        $data = [
             'teacher' => $teacher,
             'teams' => $teams,
             'students' => $users,
             'activities' => $activities,
             'payments' => $payments,
-        ]);
+        ];
+
+        // dd($data);
+
+        return $this->inertia('Lk/LkTeacher', $data);
     }
 
     public function allTeams()
