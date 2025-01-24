@@ -143,7 +143,7 @@
         </q-card-section>
 
         <q-card-section>
-          <students-list
+          <students-list2
             :students="students"
             :teams="teams"
           />
@@ -160,7 +160,7 @@ import NewStudentDialog from '@/modules/lms/Components/lk/teacher/NewStudentDial
 import TransferStudentDialog from '@/modules/lms/Components/lk/teacher/TransferStudentDialog.vue'
 import NewPaymentDialog from '@/modules/lms/Components/lk/teacher/NewPaymentDialog.vue'
 import SubscriptionDialog from '@/modules/lms/Components/lk/teacher/SubscriptionDialog.vue'
-import StudentsList from '@/modules/lms/Components/lk/teacher/StudentsList.vue'
+import StudentsList2 from '@/modules/lms/Components/lk/teacher/StudentsList2.vue'
 
 const showNewStudentDialog = ref(false)
 const showTransferStudentDialog = ref(false)
