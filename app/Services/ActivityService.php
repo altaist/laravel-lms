@@ -114,19 +114,18 @@ class ActivityService extends BaseService
             ->first();
     }
 
-    public function completeActivity(Activity $activity, User $user, int $coinId, int $creditValue)
+    /**
+     * Списать кредиты за активность
+     */
+    public function deductCreditsForActivity(Activity $activity, User $user, int $creditValue): void
     {
-        return DB::transaction(function () use ($activity, $user, $coinId, $creditValue) {
-            // ... какая-то логика ...
-
-            $this->balanceService->updateCreditAndBalance(
-                creditable: $activity,
-                user: $user,
-                coinId: $coinId,
-                creditValue: $creditValue
-            );
-
-            // ... остальная логика ...
-        });
+        // Используем отрицательное значение для списания
+        $this->balanceService->updateCreditAndBalance(
+            creditable: $activity,
+            userId: $user->id,
+            creditCoinId: 2, // Фиксированный coin_id для кредитов активности
+            creditValue: -abs($creditValue), // Гарантируем отрицательное значение
+            reasonId: 2 // Предполагаем, что есть reason_id для списания за активность
+        );
     }
 } 

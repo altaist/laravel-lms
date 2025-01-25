@@ -7,6 +7,7 @@ use App\Models\Credit;
 use App\Models\Payment;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class BalanceService extends BaseService
@@ -32,17 +33,17 @@ class BalanceService extends BaseService
      */
     public function updateCreditAndBalance(
         Model $creditable,
-        User $user,
-        int $coinId,
+        int $userId,
+        int $creditCoinId,
         int $creditValue,
         int $reasonId = 1
     ): void {
-        DB::transaction(function () use ($creditable, $user, $coinId, $creditValue, $reasonId) {
+        DB::transaction(function () use ($creditable, $userId, $creditCoinId, $creditValue, $reasonId) {
             // Создаем запись в credits
             Credit::create([
-                'author_id' => $creditable->author_id,
-                'user_id' => $user->id,
-                'coin_id' => $coinId,
+                'author_id' => Auth::id(),
+                'user_id' => $userId,
+                'coin_id' => $creditCoinId,
                 'amount' => $creditValue,
                 'creditable_type' => get_class($creditable),
                 'creditable_id' => $creditable->id,
@@ -50,26 +51,14 @@ class BalanceService extends BaseService
             ]);
 
             // Обновляем баланс
-            $currentBalance = Balance::where('user_id', $user->id)
-                ->where('coin_id', $coinId)
+            $currentBalance = Balance::where('user_id', $userId)
+                ->where('coin_id', $creditCoinId)
                 ->first();
 
             $newAmount = ($currentBalance ? $currentBalance->amount : 0) + $creditValue;
             
-            $this->updateBalance($user->id, $coinId, $newAmount);
+            $this->updateBalance($userId, $creditCoinId, $newAmount);
         });
     }
 
-    /**
-     * Обновить кредит и баланс для платежа
-     */
-    public function updateCreditAndBalanceForPayment(Payment $payment, User $user, int $coinId, int $creditValue): void
-    {
-        $this->updateCreditAndBalance(
-            creditable: $payment,
-            user: $user,
-            coinId: $coinId,
-            creditValue: $creditValue
-        );
-    }
 } 
