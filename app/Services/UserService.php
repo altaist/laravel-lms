@@ -31,7 +31,7 @@ class UserService
 
             // Добавляем пароль только если он предоставлен
             if (isset($data['password'])) {
-                // $fillData['password'] = $data['password'];
+                $fillData['password'] = $data['password'];
             }
 
             $user->fill($fillData);
