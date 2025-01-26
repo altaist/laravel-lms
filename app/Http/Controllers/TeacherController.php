@@ -134,4 +134,18 @@ class TeacherController extends BaseController
             'students' => $students,
         ]);
     }
+
+    public function students()
+    {
+        $teacher = Auth::user();
+        $teamService = TeamService::make();
+        $teams = $teamService->getAllTeams();
+        $students = $teamService->getAllTeamUsers();
+
+        return $this->inertia('Lk/AllStudents', [
+            'teacher' => $teacher,
+            'teams' => $teams,
+            'students' => $students,
+        ]);
+    }
 }

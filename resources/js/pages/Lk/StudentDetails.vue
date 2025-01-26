@@ -5,14 +5,14 @@
     <div class="q-pa-md">
       
       <q-dialog v-model="showEditDialog">
-        <q-card class="q-pa-md" style="min-width: 500px">
+        <q-card class="full-width" style="max-width: 900px; margin: 20px;">
           <q-card-section class="row items-center">
             <div class="text-h6">Редактировать</div>
             <q-space />
             <q-btn icon="close" flat round dense v-close-popup />
           </q-card-section>
 
-          <q-card-section>
+          <q-card-section class="q-pa-sm">
             <user-edit
               :user="student"
               :teams="teams"
@@ -27,8 +27,8 @@
         <q-card-section>
           <div class="row items-center">
             <div class="col">
-              <div class="text-h5">{{ student.name }}</div>
-              <div class="text-caption">{{ student.email }}</div>
+              <div class="text-h5">{{ student.person.firstName }} {{ student.person.lastName }}</div>
+              <div class="text-caption">{{ student.tel }}</div>
             </div>
             <div class="col-auto">
               <balance-chip

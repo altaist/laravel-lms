@@ -25,7 +25,12 @@
               v-model="form.person.lastName"
               label="Фамилия *"
               :rules="[val => !!val || 'Обязательное поле']"
-            />
+              filled
+            >
+              <template v-slot:append>
+                <div class="text-red">*</div>
+              </template>
+            </q-input>
           </div>
 
           <div class="col-12 col-sm-6">
@@ -33,7 +38,12 @@
               v-model="form.person.firstName"
               label="Имя *"
               :rules="[val => !!val || 'Обязательное поле']"
-            />
+              filled
+            >
+              <template v-slot:append>
+                <div class="text-red">*</div>
+              </template>
+            </q-input>
           </div>
 
           <!-- ФИО родителя -->
@@ -42,7 +52,12 @@
               v-model="form.person.parentFio"
               label="ФИО родителя *"
               :rules="[val => !!val || 'Обязательное поле']"
-            />
+              filled
+            >
+              <template v-slot:append>
+                <div class="text-red">*</div>
+              </template>
+            </q-input>
           </div>
 
           <!-- Телефон родителя -->
@@ -52,9 +67,13 @@
               label="Телефон родителя *"
               mask="(###) ###-##-##"
               :rules="[val => !!val || 'Обязательное поле']"
+              filled
             >
               <template v-slot:prepend>
                 <div class="text-grey">+7</div>
+              </template>
+              <template v-slot:append>
+                <div class="text-red">*</div>
               </template>
             </q-input>
           </div>
@@ -67,6 +86,7 @@
               label="Пол"
               emit-value
               map-options
+              filled
             />
           </div>
 
@@ -77,6 +97,7 @@
               label="Смена"
               emit-value
               map-options
+              filled
             />
           </div>
 
@@ -86,6 +107,7 @@
               v-model="form.person.birthDate"
               type="date"
               label="Дата рождения"
+              filled
             />
           </div>
         </div>

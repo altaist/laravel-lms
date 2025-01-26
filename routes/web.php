@@ -27,6 +27,8 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::post('/payments', [PaymentController::class, 'store'])->name('payments.store');
     Route::get('/lk/teacher', [TeacherController::class, 'lk'])->name('teacher.lk');
+    Route::get('/teacher/students', [TeacherController::class, 'students'])
+        ->name('teacher.students');
     Route::get('/teacher/students/{studentId}', [TeacherController::class, 'studentDetails'])
         ->name('teacher.student.details');
     Route::get('/teacher/payments', [TeacherController::class, 'payments'])

@@ -40,14 +40,14 @@
 
     <!-- Диалоговые окна -->
     <q-dialog v-model="showNewStudentDialog">
-      <q-card class="q-pa-md" style="min-width: 500px">
+      <q-card class="full-width" style="max-width: 900px; margin: 20px;">
         <q-card-section class="row items-center">
           <div class="text-h6">Новый ученик</div>
           <q-space />
           <q-btn icon="close" flat round dense v-close-popup />
         </q-card-section>
 
-        <q-card-section>
+        <q-card-section class="q-pa-sm">
           <user-edit
             :teams="teams"
             @saved="onUserSaved"
@@ -92,7 +92,7 @@
           stack
           label="Ученики"
           icon="fa fa-users"
-          @click="showStudentsList = true"
+          @click="router.visit(route('teacher.students'))"
         />
       </div>
 
@@ -119,24 +119,6 @@
         />
       </div>
     </div>
-
-    <!-- Диалог для списка учеников -->
-    <q-dialog v-model="showStudentsList" full-width>
-      <q-card>
-        <q-card-section class="row items-center">
-          <div class="text-h6">Список учеников</div>
-          <q-space />
-          <q-btn icon="fa fa-times" flat round dense v-close-popup />
-        </q-card-section>
-
-        <q-card-section>
-          <students-list
-            :students="students"
-            :teams="teams"
-          />
-        </q-card-section>
-      </q-card>
-    </q-dialog>
   </page-layout-home>
 </template>
 
@@ -147,13 +129,11 @@ import UserEdit from '@/modules/lms/components/users/UserEdit.vue'
 import TransferStudentDialog from '@/modules/lms/components/lk/teacher/TransferStudentDialog.vue'
 import NewPaymentDialog from '@/modules/lms/components/lk/teacher/NewPaymentDialog.vue'
 import SubscriptionDialog from '@/modules/lms/components/lk/teacher/SubscriptionDialog.vue'
-import StudentsList from '@/modules/lms/components/users/StudentsList.vue'
 
 const showNewStudentDialog = ref(false)
 const showTransferStudentDialog = ref(false)
 const showNewPaymentDialog = ref(false)
 const showSubscriptionDialog = ref(false)
-const showStudentsList = ref(false)
 
 const props = defineProps({
   teams: {
