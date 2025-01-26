@@ -1,5 +1,5 @@
 <template>
-    <div class="q-pa-md sticky top bg-white border">
+    <div class="q-pa-md sticky top bg-white border" style="z-index: 1000;">
         <div class="row items-center">
             <div class="col" v-if="leftBtnIcon">
                 <btn :icon="leftBtnIcon" @click="onLeftBtnlick"/>

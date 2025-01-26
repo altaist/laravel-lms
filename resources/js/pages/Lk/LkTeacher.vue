@@ -24,18 +24,6 @@
           
       </div>
 
-      <!-- Перенос ученика -->
-      <div class="col-6 col-sm-3">
-        <q-btn
-          class="full-width"
-          color="secondary"
-          stack
-          label="Перенос ученика"
-          icon="fa fa-exchange-alt"
-          @click="showTransferStudentDialog = true"
-        />
-      </div>
-
       <!-- Новая оплата -->
       <div class="col-6 col-sm-3">
         <q-btn
@@ -48,17 +36,6 @@
         />
       </div>
 
-      <!-- Абонемент -->
-      <div class="col-6 col-sm-3">
-        <q-btn
-          class="full-width"
-          color="purple"
-          stack
-          label="Абонемент"
-          icon="fa fa-id-card"
-          @click="showSubscriptionDialog = true"
-        />
-      </div>
     </div>
 
     <!-- Диалоговые окна -->

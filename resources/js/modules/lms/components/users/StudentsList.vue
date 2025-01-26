@@ -65,21 +65,9 @@
       </q-card-section>
 
       <q-card-section v-if="selectedStudent">
-        <div class="q-gutter-y-md">
-          <div class="row q-col-gutter-md">
-            <div class="col-12 col-sm-6">
-              <div class="text-subtitle2">ФИО</div>
-              <div>{{ selectedStudent.name }}</div>
-            </div>
-            <div class="col-12 col-sm-6">
-              <div class="text-subtitle2">Группы</div>
-              <div>{{ selectedStudent.teams?.map(team => team.name).join(', ') || 'Нет групп' }}</div>
-            </div>
-          </div>
-        </div>
+        <student-info :student="selectedStudent" />
       </q-card-section>
 
-      <!-- Добавляем секцию с кнопкой -->
       <q-card-actions align="right">
         <q-btn
           color="primary"
@@ -87,7 +75,6 @@
           @click="openStudentDetails"
         />
       </q-card-actions>
-
     </q-card>
   </q-dialog>
 </template>
@@ -96,6 +83,7 @@
 import { ref, computed } from 'vue'
 import { router } from '@inertiajs/vue3'
 import BalanceChip from '@/modules/lms/components/shared/BalanceChip.vue'
+import StudentInfo from '@/modules/lms/components/users/StudentInfo.vue'
 
 const props = defineProps({
   students: {

@@ -1,5 +1,5 @@
 <template>
-  <q-card style="min-width: 350px">
+  <q-card class="full-width" style="max-width: 900px">
     <q-card-section class="row items-center">
       <div class="text-h6">Новая оплата</div>
       <q-space />
@@ -14,46 +14,65 @@
           :options="userOptions"
           label="Пользователь *"
           :rules="[val => !!val || 'Обязательное поле']"
+          class="q-mb-md"
         />
 
         <div v-else class="text-subtitle1 q-mb-md">
           Ученик: {{ props.user.person?.lastName }} {{ props.user.person?.firstName }}
         </div>
 
-        <q-input
-          v-model.number="form.amount"
-          type="number"
-          label="Сумма *"
-          :rules="[val => !!val || 'Обязательное поле']"
-        />
+        <div class="row ">
+          <div class="col-12 col-sm-6">
+            <q-input
+              v-model.number="form.amount"
+              type="number"
+              label="Сумма *"
+              :rules="[val => !!val || 'Обязательное поле']"
+              filled
+            >
+              <template v-slot:append>
+                <div class="text-grey">₽</div>
+              </template>
+            </q-input>
+          </div>
+          <div class="col-12 col-sm-6">
+            <q-input
+              v-model.number="form.credit_amount"
+              type="number"
+              label="Кол-во занятий *"
+              :rules="[val => !!val || 'Обязательное поле']"
+              filled
+            >
 
-        <q-input
-          v-model.number="form.credit_amount"
-          type="number"
-          label="Кол-во занятий *"
-          :rules="[val => !!val || 'Обязательное поле']"
-        />
+            </q-input>
+          </div>
+        </div>
 
         <q-checkbox
           v-model="form.pay_from"
           label="Безнал"
           true-value="card"
           false-value="cash"
-        />
-
-        <q-input
-          v-model="form.description"
-          type="textarea"
-          label="Комментарий"
+          class="q-mb-md"
         />
 
         <q-input
           v-model="form.payment_at"
           type="datetime-local"
           label="Дата платежа"
+          filled
+          class="q-mb-md"
         />
 
-        <div class="row justify-end q-mt-md">
+        <q-input
+          v-model="form.description"
+          type="textarea"
+          label="Комментарий"
+          filled
+          autogrow
+        />
+
+        <div class="row justify-end q-mt-lg">
           <q-btn label="Отмена" flat v-close-popup class="q-mr-sm" />
           <q-btn label="Сохранить" type="submit" color="primary" />
         </div>
@@ -85,8 +104,8 @@ const $q = useQuasar()
 const form = ref({
   user: null,
   amount: 4000,
-  coin_amount: 8,
-  pay_from: 'cash',
+  credit_amount: 8,
+  pay_from: 'card',
   description: '',
   payment_at: new Date().toISOString().slice(0, 16)
 })
@@ -111,7 +130,7 @@ const onSubmit = async () => {
     const formData = {
       ...form.value,
       user_id: Number(form.value.user.value),
-      coin_id: 1  // Добавляем coin_id если он фиксированный, иначе нужно добавить селект
+      coin_id: 1
     }
     
     await axios.post(route('payments.store'), formData)

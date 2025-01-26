@@ -48,96 +48,15 @@
 
       <q-tab-panels v-model="tab" class="q-px-none">
         <q-tab-panel name="info" class="q-pa-sm">
-          <q-card>
-            <q-card-section>
-              <div class="text-h6">Информация о студенте</div>
-              <div class="q-gutter-y-md q-mt-md">
-                <div class="row q-col-gutter-md">
-                  <div class="col-12 col-sm-6">
-                    <q-input
-                      readonly
-                      outlined
-                      dense
-                      label="Фамилия"
-                      :model-value="student.person?.lastName"
-                    />
-                  </div>
-                  <div class="col-12 col-sm-6">
-                    <q-input
-                      readonly
-                      outlined
-                      dense
-                      label="Имя"
-                      :model-value="student.person?.firstName"
-                    />
-                  </div>
-                </div>
-
-                <q-input
-                  readonly
-                  outlined
-                  dense
-                  label="ФИО родителя"
-                  :model-value="student.person?.parentFio"
-                />
-
-                <q-input
-                  readonly
-                  outlined
-                  dense
-                  label="Телефон родителя"
-                  :model-value="formatPhone(student.person?.parentTel)"
-                >
-                  <template v-slot:append>
-                    <q-btn
-                      flat
-                      round
-                      icon="phone"
-                      color="primary"
-                      @click="callPhone(student.person?.parentTel)"
-                    />
-                  </template>
-                </q-input>
-
-                <div class="row q-col-gutter-md">
-                  <div class="col-12 col-sm-6">
-                    <q-input
-                      readonly
-                      outlined
-                      dense
-                      label="Пол"
-                      :model-value="student.person?.gender === 'M' ? 'Мужской' : 'Женский'"
-                    />
-                  </div>
-                  <div class="col-12 col-sm-6">
-                    <q-input
-                      readonly
-                      outlined
-                      dense
-                      label="Смена"
-                      :model-value="student.person?.shift"
-                    />
-                  </div>
-                </div>
-
-                <q-input
-                  readonly
-                  outlined
-                  dense
-                  label="Дата рождения"
-                  :model-value="formatDate(student.person?.birthDate)"
-                />
-              </div>
-            </q-card-section>
-          </q-card>
+          <student-info :student="student" />
           <div class="q-my-md">
-        <q-btn
-          color="primary"
-          icon="edit"
-          label="Изменить"
-          @click="showEditDialog = true"
-        />
-      </div>
+            <q-btn
+              color="primary"
+              icon="edit"
+              label="Изменить"
+              @click="showEditDialog = true"
+            />
+          </div>
         </q-tab-panel>
         <q-tab-panel name="teams" class="q-pa-sm">
           <q-card>
@@ -226,6 +145,7 @@ import { Head } from '@inertiajs/vue3'
 import { ref, onMounted } from 'vue'
 import BalanceChip from '@/modules/lms/components/shared/BalanceChip.vue'
 import UserEdit from '@/modules/lms/components/users/UserEdit.vue'
+import StudentInfo from '@/modules/lms/components/users/StudentInfo.vue'
 import { router } from '@inertiajs/vue3'
 import { date } from 'quasar'
 import PaymentsList from '@/modules/lms/components/payments/PaymentsList.vue'
