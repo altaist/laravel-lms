@@ -61,7 +61,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { date } from 'quasar'
-import PaymentsList from '@/modules/lms/Components/payments/PaymentsList.vue'
+import PaymentsList from '@/modules/lms/components/payments/PaymentsList.vue'
 
 const props = defineProps({
   payments: {

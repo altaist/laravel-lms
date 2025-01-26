@@ -95,7 +95,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { router } from '@inertiajs/vue3'
-import BalanceChip from '@/Components/BalanceChip.vue'
+import BalanceChip from '@/modules/lms/components/shared/BalanceChip.vue'
 
 const props = defineProps({
   students: {

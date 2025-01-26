@@ -224,12 +224,12 @@
 <script setup>
 import { Head } from '@inertiajs/vue3'
 import { ref, onMounted } from 'vue'
-import BalanceChip from '@/Components/BalanceChip.vue'
-import UserEdit from '@/modules/lms/Components/users/UserEdit.vue'
+import BalanceChip from '@/modules/lms/components/shared/BalanceChip.vue'
+import UserEdit from '@/modules/lms/components/users/UserEdit.vue'
 import { router } from '@inertiajs/vue3'
 import { date } from 'quasar'
-import PaymentsList from '@/modules/lms/Components/payments/PaymentsList.vue'
-import NewPaymentDialog from '@/modules/lms/Components/lk/teacher/NewPaymentDialog.vue'
+import PaymentsList from '@/modules/lms/components/payments/PaymentsList.vue'
+import NewPaymentDialog from '@/modules/lms/components/lk/teacher/NewPaymentDialog.vue'
 
 const props = defineProps({
   student: Object,

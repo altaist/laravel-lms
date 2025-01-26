@@ -166,11 +166,11 @@
 <script setup>
 import { ref } from 'vue'
 import { router } from '@inertiajs/vue3'
-import UserEdit from '@/modules/lms/Components/users/UserEdit.vue'
-import TransferStudentDialog from '@/modules/lms/Components/lk/teacher/TransferStudentDialog.vue'
-import NewPaymentDialog from '@/modules/lms/Components/lk/teacher/NewPaymentDialog.vue'
-import SubscriptionDialog from '@/modules/lms/Components/lk/teacher/SubscriptionDialog.vue'
-import StudentsList2 from '@/modules/lms/Components/lk/teacher/StudentsList2.vue'
+import UserEdit from '@/modules/lms/components/users/UserEdit.vue'
+import TransferStudentDialog from '@/modules/lms/components/lk/teacher/TransferStudentDialog.vue'
+import NewPaymentDialog from '@/modules/lms/components/lk/teacher/NewPaymentDialog.vue'
+import SubscriptionDialog from '@/modules/lms/components/lk/teacher/SubscriptionDialog.vue'
+import StudentsList2 from '@/modules/lms/components/lk/teacher/StudentsList2.vue'
 
 const showNewStudentDialog = ref(false)
 const showTransferStudentDialog = ref(false)
