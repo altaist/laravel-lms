@@ -18,7 +18,7 @@ Route::post('/register-without-email', [App\Http\Controllers\Auth\CustomRegister
 Route::post('student/{student_id}/teams/{team_id}', [StudentController::class, 'toggleTeamMembership'])->name('api.student.toggle-team');
 Route::delete('student/{student_id}/teams/{team_id}', [StudentController::class, 'toggleTeamMembership'])->name('api.student.toggle-team');
 
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware('auth')->group(function () {
     Route::get('/student/teams', [StudentController::class, 'getTeams']);
     Route::get('/student/payments', [StudentController::class, 'getPayments']);
     Route::get('/student/activities', [StudentController::class, 'getActivities']);
@@ -26,4 +26,5 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('activities/{id}/process', [ActivityController::class, 'processActivity']);
     Route::get('activities/{id}/details', [ActivityController::class, 'getDetails']);
     Route::get('teams/{teamId}/activities', [ActivityController::class, 'getTeamActivities']);
+    //Route::apiResource('students', StudentController::class)->except(['index', 'destroy']);
 });

@@ -9,11 +9,16 @@
     <q-card-section>
       <q-form @submit="onSubmit" class="q-gutter-md">
         <q-select
+          v-if="!props.user"
           v-model="form.user"
           :options="userOptions"
           label="Пользователь *"
           :rules="[val => !!val || 'Обязательное поле']"
         />
+
+        <div v-else class="text-subtitle1 q-mb-md">
+          Ученик: {{ props.user.person?.lastName }} {{ props.user.person?.firstName }}
+        </div>
 
         <q-input
           v-model.number="form.amount"
@@ -64,7 +69,13 @@ import { useQuasar } from 'quasar'
 const props = defineProps({
   users: {
     type: Array,
-    required: true
+    required: false,
+    default: () => []
+  },
+  user: {
+    type: Object,
+    required: false,
+    default: null
   }
 })
 
@@ -80,7 +91,15 @@ const form = ref({
   payment_at: new Date().toISOString().slice(0, 16)
 })
 
+if (props.user) {
+  form.value.user = {
+    label: `${props.user.person?.lastName} ${props.user.person?.firstName}`,
+    value: props.user.id
+  }
+}
+
 const userOptions = computed(() => {
+  if (props.user) return []
   return props.users.map(user => ({
     label: `${user.name} ${user.surname || ''}`,
     value: user.id

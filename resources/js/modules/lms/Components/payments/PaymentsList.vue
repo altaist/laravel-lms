@@ -1,5 +1,6 @@
 <template>
   <!-- Список платежей -->
+  
   <q-list bordered separator>
     <q-item
       v-for="payment in payments"

@@ -63,11 +63,21 @@
 
     <!-- Диалоговые окна -->
     <q-dialog v-model="showNewStudentDialog">
-      <new-student-dialog
-        :teams="teams"
-        :students="students"
-        :payments="payments"
-      />
+      <q-card class="q-pa-md" style="min-width: 500px">
+        <q-card-section class="row items-center">
+          <div class="text-h6">Новый ученик</div>
+          <q-space />
+          <q-btn icon="close" flat round dense v-close-popup />
+        </q-card-section>
+
+        <q-card-section>
+          <user-edit
+            :teams="teams"
+            @saved="onUserSaved"
+            @cancelled="showNewStudentDialog = false"
+          />
+        </q-card-section>
+      </q-card>
     </q-dialog>
 
     <q-dialog v-model="showTransferStudentDialog">
@@ -156,7 +166,7 @@
 <script setup>
 import { ref } from 'vue'
 import { router } from '@inertiajs/vue3'
-import NewStudentDialog from '@/modules/lms/Components/lk/teacher/NewStudentDialog.vue'
+import UserEdit from '@/modules/lms/Components/users/UserEdit.vue'
 import TransferStudentDialog from '@/modules/lms/Components/lk/teacher/TransferStudentDialog.vue'
 import NewPaymentDialog from '@/modules/lms/Components/lk/teacher/NewPaymentDialog.vue'
 import SubscriptionDialog from '@/modules/lms/Components/lk/teacher/SubscriptionDialog.vue'
@@ -190,4 +200,10 @@ const props = defineProps({
     required: true
   }
 })
+
+const onUserSaved = () => {
+  showNewStudentDialog.value = false;
+  // Обновляем список студентов с сервера
+  router.reload({ only: ['students'] });
+}
 </script> 

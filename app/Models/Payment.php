@@ -29,6 +29,11 @@ class Payment extends Model
     {
         return $this->belongsTo(User::class);
     }
+    
+    public function coin(): BelongsTo
+    {
+        return $this->belongsTo(Coin::class);
+    }
 
     public function author(): BelongsTo
     {

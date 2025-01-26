@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\StudentController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -30,6 +31,8 @@ Route::middleware('auth')->group(function () {
         ->name('teacher.student.details');
     Route::get('/teacher/payments', [TeacherController::class, 'payments'])
         ->name('teacher.payments');
+
+    Route::apiResource('users', StudentController::class)->except(['index', 'destroy']);
 });
 
 require __DIR__.'/auth.php';

@@ -127,12 +127,23 @@ class PaymentService extends BaseService
             
             $this->balanceService->updateCreditAndBalance(
                 creditable: $payment,
-                user: $payment->user,
-                coinId: 2,
+                userId: $payment->user_id,
+                creditCoinId: 2,
                 creditValue: $data['credit_amount']
             );
             
             return $payment;
         });
+    }
+
+    /**
+     * Получить все платежи конкретного студента
+     */
+    public function getUserPayments(int $userId): Collection
+    {
+        return Payment::where('user_id', $userId)
+            ->with(['user', 'coin'])
+            ->orderBy('payment_at', 'desc')
+            ->get();
     }
 } 
