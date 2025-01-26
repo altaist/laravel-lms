@@ -1,7 +1,4 @@
 <template>
-  <q-card>
-    <q-card-section>
-      <div class="text-h6">Информация о студенте</div>
       <div class="q-gutter-y-md q-mt-md">
         <div class="row q-col-gutter-md">
           <div class="col-12 col-sm-6">
@@ -79,8 +76,6 @@
           :model-value="formatDate(student.person?.birthDate)"
         />
       </div>
-    </q-card-section>
-  </q-card>
 </template>
 
 <script setup>

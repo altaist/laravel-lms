@@ -47,7 +47,7 @@
       </q-tabs>
 
       <q-tab-panels v-model="tab" class="q-px-none">
-        <q-tab-panel name="info" class="q-pa-sm">
+        <q-tab-panel name="info" class="q-pa-none">
           <student-info :student="student" />
           <div class="q-my-md">
             <q-btn

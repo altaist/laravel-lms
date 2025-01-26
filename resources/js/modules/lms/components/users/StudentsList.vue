@@ -57,7 +57,7 @@
 
   <!-- Диалог с деталями ученика -->
   <q-dialog v-model="showDialog" persistent :max-width="'90vw'" :width="'90vw'">
-    <q-card>
+    <q-card class="full-width q-my-xl">
       <q-card-section class="row items-center">
         <div class="text-h6">Информация об ученике</div>
         <q-space />
@@ -70,6 +70,7 @@
 
       <q-card-actions align="right">
         <q-btn
+          class="q-mb-md q-mr-sm"
           color="primary"
           label="Открыть в карточке"
           @click="openStudentDetails"
