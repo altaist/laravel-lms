@@ -43,6 +43,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/team/{teamId}', [TeamController::class, 'show'])->name('teams.show');
     Route::post('/team/add-student', [TeamController::class, 'addStudent'])->name('teams.add-student');
     Route::post('/team/remove-student', [TeamController::class, 'removeStudent'])->name('teams.remove-student');
+    Route::put('/teams/{team}/schedule', [TeamController::class, 'updateSchedule'])
+        ->name('teams.schedule.update');
+    Route::get('/teams/schedules', [TeamController::class, 'getAllSchedules'])
+        ->name('teams.schedules.all');
+    Route::get('/teams/all-schedules',[TeacherController::class, 'schedules'])->name('teams.schedules.all.view');
 });
 
 require __DIR__.'/auth.php';

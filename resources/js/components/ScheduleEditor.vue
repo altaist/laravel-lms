@@ -13,6 +13,7 @@
                 option-label="label"
                 option-value="value"
                 label="День недели"
+                emit-value
                 dense
                 outlined
               />
@@ -88,17 +89,22 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useQuasar } from 'quasar'
+import axios from 'axios'
 
 const $q = useQuasar()
 
 const props = defineProps({
+  teamId: {
+    type: [Number, String],
+    required: true
+  },
   scheduleDays: {
     type: Array,
     default: () => []
   }
 })
 
-const emit = defineEmits(['update:scheduleDays'])
+const emit = defineEmits(['update:scheduleDays', 'cancelled'])
 
 const saving = ref(false)
 const localSchedule = ref([])
@@ -152,15 +158,23 @@ const saveSchedule = async () => {
 
   saving.value = true
   try {
-    emit('update:scheduleDays', localSchedule.value)
+    // Отправляем запрос на обновление расписания
+    const { data } = await axios.put(`/teams/${props.teamId}/schedule`, {
+      schedule_days: localSchedule.value
+    })
+
+    // Обновляем локальное состояние
+    emit('update:scheduleDays', data.schedule_days)
+
     $q.notify({
       color: 'positive',
-      message: 'Расписание сохранено'
+      message: 'Расписание успешно сохранено'
     })
   } catch (error) {
+    console.error('Ошибка при сохранении расписания:', error)
     $q.notify({
       color: 'negative',
-      message: 'Ошибка при сохранении расписания'
+      message: error.response?.data?.message || 'Ошибка при сохранении расписания'
     })
   } finally {
     saving.value = false
@@ -169,6 +183,7 @@ const saveSchedule = async () => {
 
 // Сброс изменений
 const resetSchedule = () => {
+    emit('cancelled');
   initLocalSchedule()
 }
 
@@ -181,7 +196,6 @@ initLocalSchedule()
   max-width: 800px;
 }
 </style>
-
 /*
 const emit = defineEmits(['update:scheduleDays'])
 

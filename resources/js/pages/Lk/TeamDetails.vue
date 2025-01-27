@@ -22,17 +22,57 @@
     <q-tab-panels v-model="activeTab" animated>
       <!-- Таб Инфо -->
       <q-tab-panel name="info" class="q-pa-none">
-        <q-card flat bordered>
+        <q-card flat>
           <q-card-section>
             <div class="text-subtitle2">Тип: {{ team.type || 'Не указан' }}</div>
             
             <div class="q-mt-md">
               <div>Количество учеников: {{ users.length }}</div>
               <div>Количество занятий: {{ activities.length }}</div>
-              <div class="text-subtitle2 q-mt-sm">Расписание:</div>
-              <div>{{ team.schedule_days || 'Расписание не указано' }}</div>
             </div>
           </q-card-section>
+          <q-card-actions>
+            <q-list separator>
+          <q-item v-for="activity in activities" :key="activity.id">
+            <q-item-section>
+              <q-item-label>{{ activity.name }}</q-item-label>
+              <q-item-label caption>
+                Дата: {{ formatDate(activity.date) }}
+              </q-item-label>
+            </q-item-section>
+          </q-item>
+        </q-list>
+
+        <div class="q-mt-md">
+          <div class="text-h6 q-mb-sm">Расписание занятий</div>
+          
+          <!-- Компонент отображения расписания -->
+          <schedule-list 
+            :schedule-days="team.schedule_days || []"
+          />
+
+          <!-- Кнопка редактирования расписания -->
+          <div class="q-mt-md">
+            <q-btn
+              color="primary"
+              icon="edit"
+              label="Редактировать расписание"
+              @click="showScheduleEdit = true"
+            />
+          </div>
+
+          <!-- Диалог редактирования расписания -->
+          <schedule-edit-dialog
+            :model-value="showScheduleEdit"
+            @update:model-value="showScheduleEdit = $event"
+            :team-id="team.id"
+            :schedule-days="team.schedule_days || []"
+            @update:schedule-days="updateScheduleDays"
+            @saved="showScheduleEdit = false"
+            @cancelled="showScheduleEdit = false"
+          />
+        </div>
+          </q-card-actions>
         </q-card>
       </q-tab-panel>
 
@@ -105,35 +145,7 @@
 
       <!-- Таб Занятия -->
       <q-tab-panel name="activities" class="q-pa-none">
-        <q-list separator>
-          <q-item v-for="activity in activities" :key="activity.id">
-            <q-item-section>
-              <q-item-label>{{ activity.name }}</q-item-label>
-              <q-item-label caption>
-                Дата: {{ formatDate(activity.date) }}
-              </q-item-label>
-            </q-item-section>
-          </q-item>
-        </q-list>
-
-        <div class="q-mt-md">
-          <div class="text-h6 q-mb-sm">Расписание занятий</div>
-          
-          <!-- Компонент отображения расписания -->
-          <schedule-list 
-            :schedule-days="team.schedule_days || []"
-          />
-
-          <!-- Разделитель -->
-          <q-separator class="q-my-md" />
-
-          <!-- Компонент редактирования расписания -->
-          <div class="text-h6 q-mb-sm">Редактировать расписание</div>
-          <schedule-editor
-            :team-id="team.id"
-            v-model:schedule-days="team.schedule_days"
-          />
-        </div>
+        
       </q-tab-panel>
     </q-tab-panels>
   </page-layout>
@@ -145,7 +157,7 @@ import { router } from '@inertiajs/vue3'
 import { date, useQuasar, useDialogPluginComponent } from 'quasar'
 import StudentsList from '@/modules/lms/components/users/StudentsList.vue'
 import ScheduleList from '@/components/ScheduleList.vue'
-import ScheduleEditor from '@/components/ScheduleEditor.vue'
+import ScheduleEditDialog from '@/components/ScheduleEditDialog.vue'
 
 const $q = useQuasar()
 
@@ -175,6 +187,7 @@ const props = defineProps({
 const activeTab = ref('info')
 const showAddStudentDialog = ref(false)
 const showRemoveStudentDialog = ref(false)
+const showScheduleEdit = ref(false)
 
 const availableStudents = computed(() => {
   const currentUserIds = new Set(props.users.map(user => user.id))
@@ -250,5 +263,11 @@ const removeStudentFromTeam = (student) => {
 const formatDate = (dateString) => {
   if (!dateString) return 'Нет данных'
   return date.formatDate(dateString, 'DD.MM.YYYY')
+}
+
+const updateScheduleDays = (newDays) => {
+  if (props.team) {
+    props.team.schedule_days = newDays
+  }
 }
 </script> 

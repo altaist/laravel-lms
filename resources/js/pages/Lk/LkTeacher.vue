@@ -116,6 +116,7 @@
           stack
           label="Расписание"
           icon="fa fa-calendar-alt"
+          @click="navigateToAllSchedules"
         />
       </div>
 
@@ -174,5 +175,10 @@ const onUserSaved = () => {
   showNewStudentDialog.value = false;
   // Обновляем список студентов с сервера
   router.reload({ only: ['students'] });
+}
+
+// Функция для навигации к расписаниям всех групп
+const navigateToAllSchedules = () => {
+  router.visit(route('teams.schedules.all.view'))
 }
 </script> 

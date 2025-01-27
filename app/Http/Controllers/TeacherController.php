@@ -85,6 +85,19 @@ class TeacherController extends BaseController
         ]);
     }
 
+    public function schedules()
+    {
+        $teacher = Auth::user();
+        $teamService = TeamService::make();
+        $teams = $teamService->getAllTeamsWithUsers();
+
+        return $this->inertia('Lk/AllGroupSchedules', [
+            'teacher' => $teacher,
+            'teams' => $teams,
+        ]);
+    }
+
+
     public function teamDetails(int $teamId)
     {
         $teamService = TeamService::make();
