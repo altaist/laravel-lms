@@ -101,7 +101,7 @@ class TeacherController extends BaseController
             'users' => $users,
             'activities' => $activities,
             'payments' => $payments,
-            'allStudents' => User::all() // Добавляем список всех учеников
+            'allStudents' => User::with('balances')->get() // Добавляем список всех учеников
         ]);
     }
 

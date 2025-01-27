@@ -49,7 +49,9 @@ class TeamService extends BaseService
      */
     public function getTeamUsers(int $teamId)
     {
-        return Team::findOrFail($teamId)->users;
+        return Team::findOrFail($teamId)
+            ->load('users.balances')
+            ->users;
     }
 
     /**

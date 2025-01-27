@@ -37,21 +37,25 @@
       </q-tab-panel>
 
       <!-- Таб Ученики -->
-      <q-tab-panel name="students" class="q-pa-none">
+      <q-tab-panel name="students" class="q-px-none ">
         <students-list
           :students="users"
           :teams="[]"
           hide-teams
         />
-        <div class="q-pa-md row q-gutter-sm">
+        <div class="q-pa-md row q-gutter-sm justify-center">
           <q-btn
             color="primary"
-            label="Добавить ученика"
+            label="Добавить"
+            icon="fa fa-user-plus"
+            stack
             @click="showAddStudentDialog = true"
           />
           <q-btn
             color="negative"
-            label="Удалить ученика"
+            label="Удалить"
+            icon="fa fa-user-minus"
+            stack
             @click="showRemoveStudentDialog = true"
           />
         </div>
