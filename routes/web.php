@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\StudentController;
+use App\Http\Controllers\TeamController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -33,8 +34,15 @@ Route::middleware('auth')->group(function () {
         ->name('teacher.student.details');
     Route::get('/teacher/payments', [TeacherController::class, 'payments'])
         ->name('teacher.payments');
+    Route::get('/teacher/teams', [TeacherController::class, 'teams'])->name('teacher.teams');
+    Route::get('/teacher/team/{teamId}', [TeacherController::class, 'teamDetails'])->name('teacher.team.details');
 
     Route::apiResource('users', StudentController::class)->except(['index', 'destroy']);
+
+    Route::get('/teams', [TeamController::class, 'index'])->name('teams.index');
+    Route::get('/team/{teamId}', [TeamController::class, 'show'])->name('teams.show');
+    Route::post('/team/add-student', [TeamController::class, 'addStudent'])->name('teams.add-student');
+    Route::post('/team/remove-student', [TeamController::class, 'removeStudent'])->name('teams.remove-student');
 });
 
 require __DIR__.'/auth.php';

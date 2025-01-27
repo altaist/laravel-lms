@@ -85,7 +85,7 @@
     <!-- Дополнительные кнопки -->
     <div class="row q-col-gutter-md justify-center q-mt-lg">
       <!-- Ученики -->
-      <div class="col-12 col-sm-4">
+      <div class="col-12 col-sm-3">
         <q-btn
           class="full-width"
           color="deep-orange"
@@ -96,8 +96,20 @@
         />
       </div>
 
+      <!-- Группы -->
+      <div class="col-12 col-sm-3">
+        <q-btn
+          class="full-width"
+          color="purple"
+          stack
+          label="Группы"
+          icon="fa fa-user-friends"
+          @click="router.visit(route('teacher.teams'))"
+        />
+      </div>
+
       <!-- Расписание -->
-      <div class="col-12 col-sm-4">
+      <div class="col-12 col-sm-3">
         <q-btn
           class="full-width"
           color="teal"
@@ -108,7 +120,7 @@
       </div>
 
       <!-- Отчеты -->
-      <div class="col-12 col-sm-4">
+      <div class="col-12 col-sm-3">
         <q-btn
           class="full-width"
           color="brown"

@@ -73,28 +73,36 @@ class TeacherController extends BaseController
         ]);
     }
 
+    public function teams()
+    {
+        $teacher = Auth::user();
+        $teamService = TeamService::make();
+        $teams = $teamService->getAllTeamsWithUsers();
+
+        return $this->inertia('Lk/AllTeams', [
+            'teacher' => $teacher,
+            'teams' => $teams,
+        ]);
+    }
 
     public function teamDetails(int $teamId)
     {
-        
         $teamService = TeamService::make();
+        $activityService = ActivityService::make();
+        $paymentService = PaymentService::make();
+
         $team = $teamService->getTeamById($teamId);
         $users = $teamService->getTeamUsers($teamId);
-
-        $activityService = ActivityService::make();
         $activities = $activityService->getTeamActivities($teamId);
-
-        $paymentService = PaymentService::make();
         $payments = $paymentService->getTeamPayments($teamId);
 
-        return $this->inertia('Teacher/TeamDetails', [
+        return $this->inertia('Lk/TeamDetails', [
             'team' => $team,
             'users' => $users,
             'activities' => $activities,
-            'payments' => $payments
+            'payments' => $payments,
+            'allStudents' => User::all() // Добавляем список всех учеников
         ]);
-
-
     }
 
     public function studentDetails(int $studentId)

@@ -27,7 +27,7 @@
         <q-card-section>
           <div class="row items-center">
             <div class="col">
-              <div class="text-h5">{{ student.person.firstName }} {{ student.person.lastName }}</div>
+              <div class="text-h5">{{ student.person?.firstName || student.name }} {{ student.person?.lastName || '' }}</div>
               <div class="text-caption">{{ student.tel }}</div>
             </div>
             <div class="col-auto">

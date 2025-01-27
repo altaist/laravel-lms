@@ -102,7 +102,7 @@ class PaymentService extends BaseService
         return Payment::whereHas('user.teams', function ($query) use ($teamId) {
             $query->where('teams.id', $teamId);
         })
-        ->with(['user', 'teams'])
+        ->with(['user.teams'])
         ->orderBy('created_at', 'desc')
         ->get();
     }

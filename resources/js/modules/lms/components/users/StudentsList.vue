@@ -14,6 +14,7 @@
     </q-input>
     
     <q-select
+      v-if="!hideTeams"
       dense
       v-model="selectedTeam"
       :options="teamOptions"
@@ -33,11 +34,11 @@
       v-for="student in filteredStudents"
       :key="student.id"
       clickable
-      @click="showStudentDetails(student)"
+      @click="handleStudentClick(student)"
     >
       <q-item-section>
         <q-item-label>{{ student.name }}</q-item-label>
-        <q-item-label caption>
+        <q-item-label v-if="!hideTeams" caption>
           {{ student.teams?.map(team => team.name).join(', ') || 'Нет групп' }}
         </q-item-label>
       </q-item-section>
@@ -94,8 +95,18 @@ const props = defineProps({
   teams: {
     type: Array,
     required: true
+  },
+  hideTeams: {
+    type: Boolean,
+    default: false
+  },
+  selectionMode: {
+    type: Boolean,
+    default: false
   }
 })
+
+const emit = defineEmits(['student-selected'])
 
 const filter = ref('')
 const selectedTeam = ref(null)
@@ -114,7 +125,7 @@ const filteredStudents = computed(() => {
   let filtered = props.students
 
   // Фильтрация по группе
-  if (selectedTeam.value) {
+  if (!props.hideTeams && selectedTeam.value) {
     filtered = filtered.filter(student => 
       student.teams?.some(team => team.id === selectedTeam.value)
     )
@@ -131,9 +142,13 @@ const filteredStudents = computed(() => {
   return filtered
 })
 
-const showStudentDetails = (student) => {
-  selectedStudent.value = student
-  showDialog.value = true
+const handleStudentClick = (student) => {
+  if (props.selectionMode) {
+    emit('student-selected', student)
+  } else {
+    selectedStudent.value = student
+    showDialog.value = true
+  }
 }
 
 const openStudentDetails = () => {
