@@ -14,13 +14,13 @@ class Team extends Model
         'type',
         'description',
         'settings',
-        'schedule',
+        'json_schedule',
         'leader_id'
     ];
 
     protected $casts = [
         'settings' => 'object',
-        'schedule' => 'object'
+        'json_schedule' => 'object'
     ];
 
     /**
@@ -49,5 +49,15 @@ class Team extends Model
     public function users()
     {
         return $this->belongsToMany(User::class, 'team_user');
+    }
+
+    public function schedule()
+    {
+        return $this->hasOne(Schedule::class);
+    }
+
+    public function scheduleDays()
+    {
+        return $this->hasManyThrough(ScheduleDay::class, Schedule::class);
     }
 } 

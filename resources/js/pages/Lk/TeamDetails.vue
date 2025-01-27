@@ -30,7 +30,7 @@
               <div>Количество учеников: {{ users.length }}</div>
               <div>Количество занятий: {{ activities.length }}</div>
               <div class="text-subtitle2 q-mt-sm">Расписание:</div>
-              <div>{{ team.schedule || 'Расписание не указано' }}</div>
+              <div>{{ team.schedule_days || 'Расписание не указано' }}</div>
             </div>
           </q-card-section>
         </q-card>
@@ -115,6 +115,25 @@
             </q-item-section>
           </q-item>
         </q-list>
+
+        <div class="q-mt-md">
+          <div class="text-h6 q-mb-sm">Расписание занятий</div>
+          
+          <!-- Компонент отображения расписания -->
+          <schedule-list 
+            :schedule-days="team.schedule_days || []"
+          />
+
+          <!-- Разделитель -->
+          <q-separator class="q-my-md" />
+
+          <!-- Компонент редактирования расписания -->
+          <div class="text-h6 q-mb-sm">Редактировать расписание</div>
+          <schedule-editor
+            :team-id="team.id"
+            v-model:schedule-days="team.schedule_days"
+          />
+        </div>
       </q-tab-panel>
     </q-tab-panels>
   </page-layout>
@@ -125,6 +144,8 @@ import { ref, computed } from 'vue'
 import { router } from '@inertiajs/vue3'
 import { date, useQuasar, useDialogPluginComponent } from 'quasar'
 import StudentsList from '@/modules/lms/components/users/StudentsList.vue'
+import ScheduleList from '@/components/ScheduleList.vue'
+import ScheduleEditor from '@/components/ScheduleEditor.vue'
 
 const $q = useQuasar()
 

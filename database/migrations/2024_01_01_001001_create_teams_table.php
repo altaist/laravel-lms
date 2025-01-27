@@ -14,7 +14,7 @@ class CreateTeamsTable extends Migration
             $table->string('type')->nullable();
             $table->text('description')->nullable();
             $table->json('settings')->nullable();
-            $table->json('schedule')->nullable();
+            $table->json('json_schedule')->nullable();
             $table->foreignId('leader_id')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
             $table->softDeletes();
