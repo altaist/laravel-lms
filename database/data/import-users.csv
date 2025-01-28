@@ -1,0 +1,3 @@
+Название группы,ФИО,Имя,Фамилия,ФИО родителя,Телефон родителя,Возраст ребенка,Пол,Смена в школе,Остаток занятий на 1 февраля
+team_name,name,person.first_name,person.last_name,person.parent_fio,person.parent_tel,person.age,person.gender,shift,credits
+Робототехника Пн 10,Иван Петров,Петров Иван,,Петров Петр Иванович,79001234567,7,male,,
