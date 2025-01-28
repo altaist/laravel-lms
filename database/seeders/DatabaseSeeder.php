@@ -26,7 +26,8 @@ class DatabaseSeeder extends Seeder
             ReasonSeeder::class,
             // другие сидеры...
             CoinSeeder::class,
-            TestTeamsSeeder::class
+            TestUsersSeeder::class,
+            TestTeamsSeeder::class,
         ]);
     }
 }

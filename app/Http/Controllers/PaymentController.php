@@ -16,8 +16,8 @@ class PaymentController extends Controller
     {
         $validated = $request->validate([
             'user_id' => 'required|exists:users,id',
-            'amount' => 'required|numeric|min:0',
-            'credit_amount' => 'required|integer|min:0',
+            'amount' => 'required|numeric|min:-4000',
+            'credit_amount' => 'required|integer|min:-10',
             'pay_from' => 'required|in:cash,card',
             'description' => 'nullable|string',
             'payment_at' => 'required|date',

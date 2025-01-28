@@ -53,7 +53,7 @@ class TestTeamsSeeder extends Seeder
         ScheduleDay::truncate();
 
         // Создаем 10 пользователей
-        $users = User::factory(10)->create();
+        $users = User::where('role_id', 10)->get();
         
         // Создаем группу "Новые ученики"
         $newStudentsTeam = Team::create([
