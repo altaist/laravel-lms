@@ -30,54 +30,42 @@
               <div>Количество учеников: {{ users.length }}</div>
               <div>Количество занятий: {{ activities.length }}</div>
             </div>
+
+            <div class="q-mt-md">
+              <div class="text-h6 q-mb-sm">Расписание занятий</div>
+              
+              <!-- Компонент отображения расписания -->
+              <schedule-list 
+                :schedule-days="team.schedule_days || []"
+              />
+
+              <!-- Кнопка редактирования расписания -->
+              <div class="q-mt-md">
+                <q-btn
+                  color="primary"
+                  icon="edit"
+                  label="Редактировать расписание"
+                  @click="showScheduleEdit = true"
+                />
+              </div>
+
+              <!-- Диалог редактирования расписания -->
+              <schedule-edit-dialog
+                :model-value="showScheduleEdit"
+                @update:model-value="showScheduleEdit = $event"
+                :team-id="team.id"
+                :schedule-days="team.schedule_days || []"
+                @update:schedule-days="updateScheduleDays"
+                @saved="showScheduleEdit = false"
+                @cancelled="showScheduleEdit = false"
+              />
+            </div>
           </q-card-section>
-          <q-card-actions>
-            <q-list separator>
-          <q-item v-for="activity in activities" :key="activity.id">
-            <q-item-section>
-              <q-item-label>{{ activity.name }}</q-item-label>
-              <q-item-label caption>
-                Дата: {{ formatDate(activity.date) }}
-              </q-item-label>
-            </q-item-section>
-          </q-item>
-        </q-list>
-
-        <div class="q-mt-md">
-          <div class="text-h6 q-mb-sm">Расписание занятий</div>
-          
-          <!-- Компонент отображения расписания -->
-          <schedule-list 
-            :schedule-days="team.schedule_days || []"
-          />
-
-          <!-- Кнопка редактирования расписания -->
-          <div class="q-mt-md">
-            <q-btn
-              color="primary"
-              icon="edit"
-              label="Редактировать расписание"
-              @click="showScheduleEdit = true"
-            />
-          </div>
-
-          <!-- Диалог редактирования расписания -->
-          <schedule-edit-dialog
-            :model-value="showScheduleEdit"
-            @update:model-value="showScheduleEdit = $event"
-            :team-id="team.id"
-            :schedule-days="team.schedule_days || []"
-            @update:schedule-days="updateScheduleDays"
-            @saved="showScheduleEdit = false"
-            @cancelled="showScheduleEdit = false"
-          />
-        </div>
-          </q-card-actions>
         </q-card>
       </q-tab-panel>
 
       <!-- Таб Ученики -->
-      <q-tab-panel name="students" class="q-px-none ">
+      <q-tab-panel name="students" class="q-px-none">
         <students-list
           :students="users"
           :teams="[]"
@@ -100,7 +88,7 @@
           />
         </div>
 
-        <!-- Диалог добавления ученика -->
+        <!-- Диалоги для работы со студентами -->
         <q-dialog v-model="showAddStudentDialog">
           <q-card style="width: 700px; max-width: 80vw;">
             <q-card-section class="row items-center">
@@ -121,7 +109,6 @@
           </q-card>
         </q-dialog>
 
-        <!-- Диалог удаления ученика -->
         <q-dialog v-model="showRemoveStudentDialog">
           <q-card style="width: 700px; max-width: 80vw;">
             <q-card-section class="row items-center">
@@ -144,8 +131,37 @@
       </q-tab-panel>
 
       <!-- Таб Занятия -->
-      <q-tab-panel name="activities" class="q-pa-none">
-        
+      <q-tab-panel name="activities" class="q-px-none">
+        <div class="q-pa-none">
+          <q-list separator>
+            <q-item
+              v-for="activity in activities"
+              :key="activity.id"
+              clickable
+              v-ripple
+              @click="router.get(route('teacher.activity.details', activity.id))"
+            >
+              <q-item-section>
+                <q-item-label class="text-h6">{{ activity.name }}</q-item-label>
+                <q-item-label caption>
+                  <div class="row items-center">
+                    {{ formatDateTime(activity.starting_at) }}
+                    <template v-if="activity.finished_at">
+                      <q-icon name="arrow_forward" size="xs" class="q-mx-xs" />
+                      {{ formatDateTime(activity.finished_at) }}
+                    </template>
+                  </div>
+                </q-item-label>
+              </q-item-section>
+
+              <q-item-section side>
+                <div class="row items-center">
+                  {{ activity.users ? activity.users.length : 0 }}
+                </div>
+              </q-item-section>
+            </q-item>
+          </q-list>
+        </div>
       </q-tab-panel>
     </q-tab-panels>
   </page-layout>
@@ -154,7 +170,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { router } from '@inertiajs/vue3'
-import { date, useQuasar, useDialogPluginComponent } from 'quasar'
+import { date, useQuasar } from 'quasar'
 import StudentsList from '@/modules/lms/components/users/StudentsList.vue'
 import ScheduleList from '@/components/ScheduleList.vue'
 import ScheduleEditDialog from '@/components/ScheduleEditDialog.vue'
@@ -260,9 +276,9 @@ const removeStudentFromTeam = (student) => {
   })
 }
 
-const formatDate = (dateString) => {
+const formatDateTime = (dateString) => {
   if (!dateString) return 'Нет данных'
-  return date.formatDate(dateString, 'DD.MM.YYYY')
+  return date.formatDate(dateString, 'DD.MM.YYYY HH:mm')
 }
 
 const updateScheduleDays = (newDays) => {

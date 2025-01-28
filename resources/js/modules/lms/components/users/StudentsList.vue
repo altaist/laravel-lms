@@ -1,6 +1,6 @@
 <template>
   <!-- Фильтры -->
-  <div class="row q-gutter-md q-mb-md">
+  <div v-if="showSearch && filteredStudents.length > 10" class="row q-gutter-md q-mb-md">
     <q-input
       dense
       debounce="300"
@@ -29,7 +29,7 @@
   </div>
 
   <!-- Список учеников -->
-  <q-list bordered separator>
+  <q-list bordered separator v-if="filteredStudents.length > 0" >
     <q-item
       v-for="student in filteredStudents"
       :key="student.id"
@@ -52,7 +52,7 @@
   </q-list>
 
   <!-- Сообщение, если учеников нет -->
-  <div v-if="filteredStudents.length === 0" class="text-center q-pa-md">
+  <div v-else class="text-center q-pa-md">
     Ученики не найдены
   </div>
 
@@ -103,6 +103,10 @@ const props = defineProps({
   selectionMode: {
     type: Boolean,
     default: false
+  },
+  showSearch: {
+    type: Boolean,
+    default: true
   }
 })
 

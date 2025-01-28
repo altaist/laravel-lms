@@ -3,25 +3,41 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Carbon\Carbon;
 
 class Activity extends Model
 {
+    use SoftDeletes;
+
     protected $fillable = [
         'team_id',
+        'name',
         'description',
-        'info',
+        'json_content',
+        'json_results',
+        'status',
         'starting_at',
         'started_at',
+        'finished_at',
         'duration',
     ];
 
     protected $casts = [
-        'info' => 'object',
+        'json_content' => 'array',
+        'json_results' => 'array',
+        'status' => 'integer',
         'starting_at' => 'datetime',
         'started_at' => 'datetime',
+        'finished_at' => 'datetime',
         'duration' => 'integer',
     ];
+
+    // Константы статусов
+    const STATUS_PENDING = 0;
+    const STATUS_STARTED = 1;
+    const STATUS_FINISHED = 2;
+    const STATUS_CANCELLED = 3;
 
     public function team()
     {

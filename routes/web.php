@@ -5,6 +5,7 @@ use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\TeamController;
+use App\Http\Controllers\ActivityController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -36,6 +37,8 @@ Route::middleware('auth')->group(function () {
         ->name('teacher.payments');
     Route::get('/teacher/teams', [TeacherController::class, 'teams'])->name('teacher.teams');
     Route::get('/teacher/team/{teamId}', [TeacherController::class, 'teamDetails'])->name('teacher.team.details');
+    Route::get('/teacher/activity/{activityId}', [TeacherController::class, 'activityDetails'])
+        ->name('teacher.activity.details');
 
     Route::apiResource('users', StudentController::class)->except(['index', 'destroy']);
 
@@ -48,6 +51,17 @@ Route::middleware('auth')->group(function () {
     Route::get('/teams/schedules', [TeamController::class, 'getAllSchedules'])
         ->name('teams.schedules.all');
     Route::get('/teams/all-schedules',[TeacherController::class, 'schedules'])->name('teams.schedules.all.view');
+
+    Route::post('/activities/{activity}/start', [ActivityController::class, 'start'])
+        ->name('activities.start');
+    Route::post('/activities/{activity}/stop', [ActivityController::class, 'stop'])
+        ->name('activities.stop');
+    Route::post('/activities/add-student', [ActivityController::class, 'addStudent'])
+        ->name('activities.add-student');
+    Route::post('/activities/remove-student', [ActivityController::class, 'removeStudent'])
+        ->name('activities.remove-student');
+    Route::post('/activities/{activity}/restart', [ActivityController::class, 'restart'])
+        ->name('activities.restart');
 });
 
 require __DIR__.'/auth.php';

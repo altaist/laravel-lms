@@ -28,6 +28,7 @@ class DatabaseSeeder extends Seeder
             CoinSeeder::class,
             TestUsersSeeder::class,
             TestTeamsSeeder::class,
+            ActivitySeeder::class,
         ]);
     }
 }

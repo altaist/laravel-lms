@@ -21,7 +21,7 @@ class ActivityService extends BaseService
 
     public function getActivityById($id)
     {
-        return Activity::findOrFail($id);
+        return Activity::with(['team', 'users'])->findOrFail($id);
     }
 
     public function createActivity(array $data)
@@ -36,10 +36,24 @@ class ActivityService extends BaseService
         return $activity;
     }
 
-    public function deleteActivity($id)
+    public function startActivity($id)
     {
         $activity = $this->getActivityById($id);
-        return $activity->delete();
+        $activity->update([
+            'started_at' => now(),
+            'status' => Activity::STATUS_STARTED
+        ]);
+        return $activity;
+    }
+
+    public function stopActivity($id)
+    {
+        $activity = $this->getActivityById($id);
+        $activity->update([
+            'finished_at' => now(),
+            'status' => Activity::STATUS_FINISHED
+        ]);
+        return $activity;
     }
 
     public function addUserToActivity(int $activityId, int $userId)
@@ -69,7 +83,7 @@ class ActivityService extends BaseService
      */
     public function getTeamActivities(int $teamId): Collection
     {
-        return Activity::where('team_id', $teamId)
+        return Activity::with(['users'])->where('team_id', $teamId)
             ->orderBy('starting_at', 'desc')
             ->get();
     }
@@ -127,5 +141,32 @@ class ActivityService extends BaseService
             creditValue: -abs($creditValue), // Гарантируем отрицательное значение
             reasonId: 2 // Предполагаем, что есть reason_id для списания за активность
         );
+    }
+
+    public function restartActivity($id)
+    {
+        DB::beginTransaction();
+        try {
+            $activity = $this->getActivityById($id);
+            
+            // Отменяем списания кредитов
+            DB::table('credits')
+                ->where('creditable_type', Activity::class)
+                ->where('creditable_id', $activity->id)
+                ->delete();
+                
+            // Сбрасываем статус и временные метки
+            $activity->update([
+                'status' => Activity::STATUS_PENDING,
+                'started_at' => null,
+                'finished_at' => null
+            ]);
+            
+            DB::commit();
+            return $activity;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
+        }
     }
 } 

@@ -13,6 +13,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->timestamp('attached_at');
             $table->primary(['activity_id', 'user_id']);
+            $table->timestamps();
         });
     }
 

@@ -169,4 +169,25 @@ class TeacherController extends BaseController
             'students' => $students,
         ]);
     }
+
+    public function activityDetails(int $activityId)
+    {
+        $activityService = ActivityService::make();
+        $activity = $activityService->getActivityById($activityId);
+        $teamService = TeamService::make();
+        
+        // Получаем пользователей текущей группы и группы с id=1
+        $availableUsers = $teamService->getTeamUsers($activity->team_id)
+            ->merge($teamService->getTeamUsers(1));
+        
+        // Получаем прикрепленных пользователей
+        $attachedUsers = $activityService->getActivityUsers($activityId);
+
+        return $this->inertia('Lk/ActivityDetails', [
+            'activity' => $activity,
+            'team' => $teamService->getTeamById($activity->team_id),
+            'attachedUsers' => $attachedUsers,
+            'availableUsers' => $availableUsers
+        ]);
+    }
 }

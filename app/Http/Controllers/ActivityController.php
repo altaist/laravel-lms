@@ -124,4 +124,101 @@ class ActivityController extends Controller
         $activities = $this->activityService->getTeamActivities($teamId);
         return response()->json($activities);
     }
+
+    /**
+     * Начать активность
+     */
+    public function start(int $id): JsonResponse
+    {
+        $activity = Activity::findOrFail($id);
+        $activity->update([
+            'started_at' => now()
+        ]);
+        
+        return response()->json($activity);
+    }
+
+    /**
+     * Добавить ученика к активности
+     */
+    public function addStudent(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'activityId' => 'required|exists:activities,id',
+            'studentId' => 'required|exists:users,id'
+        ]);
+
+        $this->activityService->addUserToActivity(
+            $validated['activityId'],
+            $validated['studentId']
+        );
+
+        return response()->json(['message' => 'Student added successfully']);
+    }
+
+    /**
+     * Завершить активность
+     */
+    public function stop(int $id): JsonResponse
+    {
+        $activity = Activity::with('users')->findOrFail($id);
+        
+        // Списываем кредиты для всех прикрепленных пользователей
+        foreach ($activity->users as $user) {
+            $this->activityService->deductCreditsForActivity(
+                activity: $activity,
+                user: $user,
+                creditValue: 1 // Списываем 1 кредит
+            );
+        }
+        
+        $activity->update([
+            'finished_at' => now()
+        ]);
+        
+        return response()->json([
+            'message' => 'Activity stopped successfully',
+            'activity' => $activity
+        ]);
+    }
+
+    /**
+     * Удалить ученика из активности
+     */
+    public function removeStudent(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'activityId' => 'required|exists:activities,id',
+            'studentId' => 'required|exists:users,id'
+        ]);
+
+        $this->activityService->removeUserFromActivity(
+            $validated['activityId'],
+            $validated['studentId']
+        );
+
+        return response()->json([
+            'message' => 'Student removed successfully'
+        ]);
+    }
+
+    /**
+     * Перезапустить активность
+     */
+    public function restart(int $id): JsonResponse
+    {
+        try {
+            $activity = $this->activityService->restartActivity($id);
+            
+            return response()->json([
+                'message' => 'Activity restarted successfully',
+                'activity' => $activity
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error restarting activity',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
 } 
