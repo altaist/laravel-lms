@@ -22,13 +22,13 @@ class DatabaseSeeder extends Seeder
         
 
         $this->call([
-            RoleSeeder::class,
-            ReasonSeeder::class,
-            // другие сидеры...
-            CoinSeeder::class,
-            TestUsersSeeder::class,
-            TestTeamsSeeder::class,
-            ActivitySeeder::class,
+            DictSeeder::class,          // Справочники (роли, монеты, причины)
+            SystemUsersSeeder::class,    // Системные пользователи
         ]);
+
+        // Проверяем, нужно ли сидировать тестовые данные
+        if ($this->command->option('test')) {
+            $this->call(TestSeeder::class);
+        }
     }
 }
