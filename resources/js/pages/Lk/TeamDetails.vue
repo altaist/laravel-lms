@@ -159,11 +159,72 @@
                   {{ activity.users ? activity.users.length : 0 }}
                 </div>
               </q-item-section>
+
+              <!-- Кнопка удаления -->
+              <q-item-section side>
+                <q-btn
+                  flat
+                  round
+                  color="negative"
+                  icon="delete"
+                  :disable="activity.started_at !== null || activity.finished_at !== null"
+                  @click.stop="deleteActivity(activity.id)"
+                >
+                  <q-tooltip>Удалить занятие</q-tooltip>
+                </q-btn>
+              </q-item-section>
             </q-item>
           </q-list>
         </div>
       </q-tab-panel>
     </q-tab-panels>
+
+    <!-- FAB кнопка перемещена за пределы tab-panel -->
+    <q-btn
+      v-if="activeTab === 'activities'"
+      fab
+      icon="add"
+      color="primary"
+      class="fixed-bottom-right"
+      @click="showAddDialog = true"
+    />
+
+    <!-- Диалог добавления активности -->
+    <q-dialog v-model="showAddDialog">
+      <q-card style="min-width: 350px">
+        <q-card-section>
+          <div class="text-h6">Добавить занятие</div>
+        </q-card-section>
+
+        <q-card-section>
+          <q-select
+            v-model="newActivity.schedule_id"
+            :options="team.schedule_days"
+            :option-label="(schedule) => schedule ? `${daysMap[schedule.day_of_week]}: ${formatTime(schedule.start_time)} - ${formatTime(schedule.end_time)}` : ''"
+            option-value="id"
+            label="Выберите расписание"
+            class="q-mb-md"
+            @update:model-value="onScheduleSelect"
+          />
+          <q-input
+            v-model="newActivity.starting_at"
+            type="datetime-local"
+            label="Дата и время начала"
+            class="q-mb-md"
+          />
+          <q-input
+            v-model="newActivity.description"
+            type="textarea"
+            label="Описание"
+          />
+        </q-card-section>
+
+        <q-card-actions align="right">
+          <q-btn flat label="Отмена" v-close-popup />
+          <q-btn flat label="Сохранить" @click="saveActivity" />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
   </page-layout>
 </template>
 
@@ -174,6 +235,7 @@ import { date, useQuasar } from 'quasar'
 import StudentsList from '@/modules/lms/components/users/StudentsList.vue'
 import ScheduleList from '@/components/ScheduleList.vue'
 import ScheduleEditDialog from '@/components/ScheduleEditDialog.vue'
+import axios from 'axios'
 
 const $q = useQuasar()
 
@@ -204,6 +266,7 @@ const activeTab = ref('info')
 const showAddStudentDialog = ref(false)
 const showRemoveStudentDialog = ref(false)
 const showScheduleEdit = ref(false)
+const showAddDialog = ref(false)
 
 const availableStudents = computed(() => {
   const currentUserIds = new Set(props.users.map(user => user.id))
@@ -286,4 +349,158 @@ const updateScheduleDays = (newDays) => {
     props.team.schedule_days = newDays
   }
 }
-</script> 
+
+const getDefaultStartTime = () => {
+  const date = new Date()
+  date.setHours(date.getHours() + 1)
+  date.setMinutes(0)
+  date.setSeconds(0)
+  return date.toISOString().slice(0, 16)
+}
+
+const newActivity = ref({
+  starting_at: getDefaultStartTime(),
+  name: '',
+  description: '',
+  schedule_id: null
+})
+
+const saveActivity = async () => {
+  try {
+    await axios.post(route('activities.store'), {
+      team_id: props.team.id,
+      name: newActivity.value.name || 'Новое занятие ' + newActivity.value.starting_at,
+      starting_at: newActivity.value.starting_at,
+      description: newActivity.value.description,
+      duration: 60
+    })
+    
+    showAddDialog.value = false
+    newActivity.value = { 
+      starting_at: getDefaultStartTime(),
+      name: '',
+      description: '',
+      schedule_id: null
+    }
+    
+    // Обновляем страницу через Inertia
+    router.reload({ only: ['activities'] })
+    
+    $q.notify({
+      type: 'positive',
+      message: 'Занятие успешно добавлено',
+      position: 'top-right'
+    })
+  } catch (error) {
+    $q.notify({
+      type: 'negative',
+      message: 'Ошибка при добавлении занятия',
+      position: 'top-right'
+    })
+  }
+}
+
+const deleteActivity = async (activityId) => {
+  try {
+    $q.dialog({
+      title: 'Подтверждение',
+      message: 'Вы действительно хотите удалить это занятие?',
+      cancel: true,
+      persistent: true,
+      ok: {
+        label: 'Удалить',
+        color: 'negative'
+      },
+      cancel: {
+        label: 'Отмена',
+        color: 'primary'
+      }
+    }).onOk(async () => {
+      console.log('Удаление занятия')
+      try {
+        await axios.delete(route('activities.destroy', activityId))
+        
+        // Обновляем страницу через Inertia
+        router.reload({ only: ['activities'] })
+        
+        $q.notify({
+          type: 'positive',
+          message: 'Занятие успешно удалено',
+          position: 'top-right'
+        })
+      } catch (error) {
+        $q.notify({
+          type: 'negative',
+          message: 'Ошибка при удалении занятия',
+          position: 'top-right'
+        })
+      }
+    })
+  } catch (error) {
+    console.error('Ошибка при показе диалога:', error)
+  }
+}
+
+// Добавляем мапинг дней недели
+const daysMap = {
+  1: 'Понедельник',
+  2: 'Вторник',
+  3: 'Среда',
+  4: 'Четверг',
+  5: 'Пятница',
+  6: 'Суббота',
+  7: 'Воскресенье'
+}
+
+// Функция форматирования времени
+const formatTime = (dateTimeString) => {
+  if (!dateTimeString) return ''
+  return dateTimeString.split(' ')[1]?.substring(0, 5) || dateTimeString
+}
+
+const onScheduleSelect = (scheduleItem) => {
+  const selectedSchedule = props.team.schedule_days.find(s => s.id === scheduleItem.id)
+  if (selectedSchedule) {
+    const now = new Date()
+    const targetDay = parseInt(selectedSchedule.day_of_week)
+    const [hours, minutes] = formatTime(selectedSchedule.start_time).split(':')
+    
+    // Создаем дату на основе выбранного расписания
+    let targetDate = new Date()
+    targetDate.setHours(parseInt(hours), parseInt(minutes), 0, 0)
+    
+    const currentDay = now.getDay()
+    const adjustedCurrentDay = currentDay === 0 ? 7 : currentDay
+    
+    let daysUntilTarget = targetDay - adjustedCurrentDay
+    
+    if (daysUntilTarget < 0 || (daysUntilTarget === 0 && targetDate < now)) {
+      daysUntilTarget += 7
+    }
+    
+    targetDate.setDate(targetDate.getDate() + daysUntilTarget)
+    
+    // Форматируем дату без учета временной зоны
+    const year = targetDate.getFullYear()
+    const month = String(targetDate.getMonth() + 1).padStart(2, '0')
+    const day = String(targetDate.getDate()).padStart(2, '0')
+    const formattedHours = String(targetDate.getHours()).padStart(2, '0')
+    const formattedMinutes = String(targetDate.getMinutes()).padStart(2, '0')
+    
+    newActivity.value = {
+      ...newActivity.value,
+      starting_at: `${year}-${month}-${day}T${formattedHours}:${formattedMinutes}`,
+      schedule_id: scheduleItem
+    }
+  }
+}
+</script>
+
+<style scoped>
+.fixed-bottom-right {
+  position: fixed;
+  right: 44px;
+  bottom: 44px;
+  z-index: 2000; /* Увеличиваем z-index, чтобы кнопка была поверх всех элементов */
+}
+</style> 

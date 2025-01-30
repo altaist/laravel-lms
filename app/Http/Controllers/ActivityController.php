@@ -19,9 +19,10 @@ class ActivityController extends Controller
     /**
      * Получить список всех активностей
      */
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        $activities = $this->activityService->getAllActivities();
+        $teamId = $request->query('team_id');
+        $activities = $this->activityService->getTeamActivities($teamId);
         return response()->json($activities);
     }
 
@@ -41,10 +42,10 @@ class ActivityController extends Controller
     {
         $validated = $request->validate([
             'team_id' => 'required|exists:teams,id',
-            'description' => 'required|string',
-            'info' => 'nullable|array',
+            'name' => 'required|string',
+            'description' => 'nullable|string',
             'starting_at' => 'required|date',
-            'duration' => 'required|integer|min:1',
+            'duration' => 'required|integer|min:1'
         ]);
 
         $activity = $this->activityService->createActivity($validated);
@@ -73,8 +74,26 @@ class ActivityController extends Controller
      */
     public function destroy(int $id): JsonResponse
     {
-        $this->activityService->deleteActivity($id);
-        return response()->json(null, 204);
+        try {
+            $activity = Activity::findOrFail($id);
+            
+            // Проверяем, что активность еще не началась
+            if ($activity->started_at || $activity->finished_at) {
+                return response()->json([
+                    'message' => 'Нельзя удалить начатое или завершенное занятие'
+                ], 422);
+            }
+            
+            $activity->delete();
+            
+            return response()->json([
+                'message' => 'Занятие успешно удалено'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Ошибка при удалении занятия'
+            ], 500);
+        }
     }
 
     /**

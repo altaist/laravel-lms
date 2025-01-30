@@ -62,6 +62,10 @@ Route::middleware('auth')->group(function () {
         ->name('activities.remove-student');
     Route::post('/activities/{activity}/restart', [ActivityController::class, 'restart'])
         ->name('activities.restart');
+    Route::post('/activities', [ActivityController::class, 'store'])
+        ->name('activities.store');
+    Route::delete('/activities/{id}', [ActivityController::class, 'destroy'])
+        ->name('activities.destroy');
 });
 
 require __DIR__.'/auth.php';

@@ -3,7 +3,7 @@
     <q-card-section>
       <div class="row">
         <div class="col-10 col-md-6">
-          <div class="text-h6">{{ activity.description }}</div>
+          <div class="text-h6">{{ activity.name }}</div>
         </div>
         <div class="col-2 col-md-6 text-right">
           <div class="row items-center q-gutter-sm">

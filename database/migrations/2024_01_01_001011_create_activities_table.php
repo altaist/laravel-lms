@@ -12,7 +12,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('team_id')->constrained()->onDelete('cascade');
             $table->string('name');
-            $table->string('description');
+            $table->string('description')->nullable();
             $table->json('json_content')->nullable();
             $table->json('json_results')->nullable();
             $table->tinyInteger('status')->default(0);
