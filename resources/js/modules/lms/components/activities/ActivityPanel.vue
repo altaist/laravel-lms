@@ -4,28 +4,32 @@
       <div class="row">
         <div class="col-10 col-md-6">
           <div class="text-h6">{{ activity.name }}</div>
+          <div class="text-subtitle2">{{ activity.starting_at }}</div>
         </div>
         <div class="col-2 col-md-6 text-right">
-          <div class="row items-center q-gutter-sm">
+          <div 
+            class="row items-center q-gutter-sm" 
+            v-if="activity.starting_at && new Date(activity.starting_at) <= new Date()"
+          > 
             <q-btn
-            :icon="getActionIcon"
-            :color="getActionColor"
-            :disable="isFinished"
-            round
-            @click="handleActivityAction"
-          >
-          <q-tooltip>{{ getActionTooltip }}</q-tooltip>
-          </q-btn>
+              :icon="getActionIcon"
+              :color="getActionColor"
+              :disable="isFinished"
+              round
+              @click="handleActivityAction"
+            >
+            <q-tooltip>{{ getActionTooltip }}</q-tooltip>
+            </q-btn>
             <q-btn
-            v-if="isFinished"
-            icon="restart_alt"
-            color="warning"
-            round
-            @click="confirmRestart"
-          >
-          <q-tooltip>Перезапустить занятие</q-tooltip>
-          </q-btn>
-        </div>
+              v-if="isFinished"
+              icon="restart_alt"
+              color="warning"
+              round
+              @click="confirmRestart"
+            >
+            <q-tooltip>Перезапустить занятие</q-tooltip>
+            </q-btn>
+          </div>
         </div>
       </div>
     </q-card-section>

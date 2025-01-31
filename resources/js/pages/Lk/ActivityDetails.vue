@@ -1,7 +1,7 @@
 <template>
   <page-layout title="Занятие">
     <!-- Панель активности -->
-    <activity-panel :activity="activity" />
+    <activity-panel :activity="activity" class="q-my-md"/>
 
     <!-- Табы -->
     <q-tabs
@@ -19,73 +19,12 @@
     <q-tab-panels v-model="activeTab" animated>
       <!-- Таб Ученики -->
       <q-tab-panel name="students" class="q-px-none">
-        <div class="q-pa-md">
-          <div class="text-h6 q-mb-md">Прикрепленные ученики</div>
-          <students-list
-            :students="attachedUsers"
-            :teams="[]"
-            hide-teams
-          />
-          
-          <div class="q-mt-md row justify-center q-gutter-sm">
-            <q-btn
-            v-if="availableStudents.length > 0"
-              color="primary"
-              label="Добавить учеников"
-              icon="fa fa-user-plus"
-              @click="showAddStudentDialog = true"
-            />
-            <q-btn
-              v-if="attachedUsers.length > 0"
-              color="negative"
-              label="Удалить учеников"
-              icon="fa fa-user-minus"
-              @click="showRemoveStudentDialog = true"
-            />
-          </div>
-        </div>
-
-        <!-- Диалог добавления ученика -->
-        <q-dialog v-model="showAddStudentDialog">
-          <q-card style="width: 700px; max-width: 80vw;">
-            <q-card-section class="row items-center">
-              <div class="text-h6">Добавить ученика</div>
-              <q-space />
-              <q-btn icon="close" flat round dense v-close-popup />
-            </q-card-section>
-
-            <q-card-section>
-              <students-list
-                :students="availableStudents"
-                :teams="[]"
-                hide-teams
-                selection-mode
-                @student-selected="addStudentToActivity"
-              />
-            </q-card-section>
-          </q-card>
-        </q-dialog>
-
-        <!-- Диалог удаления ученика -->
-        <q-dialog v-model="showRemoveStudentDialog">
-          <q-card style="width: 700px; max-width: 80vw;">
-            <q-card-section class="row items-center">
-              <div class="text-h6">Удалить ученика</div>
-              <q-space />
-              <q-btn icon="close" flat round dense v-close-popup />
-            </q-card-section>
-
-            <q-card-section>
-              <students-list
-                :students="attachedUsers"
-                :teams="[]"
-                hide-teams
-                selection-mode
-                @student-selected="confirmRemoveStudent"
-              />
-            </q-card-section>
-          </q-card>
-        </q-dialog>
+        <activity-users
+          :activity="activity"
+          :team-users="teamUsers"
+          :attached-users="attachedUsers"
+          :available-users="availableUsers"
+        />
       </q-tab-panel>
 
       <!-- Таб Контент -->
@@ -96,21 +35,58 @@
 
       <!-- Таб Результаты -->
       <q-tab-panel name="results">
-        <div class="text-h6">Результаты занятия</div>
-        <!-- Здесь будут результаты -->
+        <div class="text-h6 q-mb-md">Результаты занятия</div>
+        
+        <div class="row q-col-gutter-md">
+          <!-- Планируемая дата -->
+          <div class="col-12 col-sm-6">
+            <div class="statistics-card">
+              <div class="param-name">Планируемая дата</div>
+              <div class="param-value">
+                {{ activity.starting_at ? new Date(activity.starting_at).toLocaleString() : 'Не задана' }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Фактическая дата -->
+          <div class="col-12 col-sm-6">
+            <div class="statistics-card">
+              <div class="param-name">Фактическая дата начала</div>
+              <div class="param-value">
+                {{ activity.started_at ? new Date(activity.started_at).toLocaleString() : 'Не начато' }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Дата завершения -->
+          <div class="col-12 col-sm-6">
+            <div class="statistics-card">
+              <div class="param-name">Дата завершения</div>
+              <div class="param-value">
+                {{ activity.finished_at ? new Date(activity.finished_at).toLocaleString() : 'Не завершено' }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Количество учеников -->
+          <div class="col-12 col-sm-6">
+            <div class="statistics-card">
+              <div class="param-name">Количество учеников</div>
+              <div class="param-value">
+                {{ attachedUsers.length }}
+              </div>
+            </div>
+          </div>
+        </div>
       </q-tab-panel>
     </q-tab-panels>
   </page-layout>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
-import { useQuasar } from 'quasar'
-import StudentsList from '@/modules/lms/components/users/StudentsList.vue'
+import { ref } from 'vue'
 import ActivityPanel from '@/modules/lms/components/activities/ActivityPanel.vue'
-import axios from 'axios'
-
-const $q = useQuasar()
+import ActivityUsers from '@/modules/lms/components/activities/ActivityUsers.vue'
 
 const props = defineProps({
   activity: {
@@ -125,6 +101,10 @@ const props = defineProps({
     type: Array,
     required: true
   },
+  teamUsers: {
+    type: Array,
+    required: true
+  },
   availableUsers: {
     type: Array,
     required: true
@@ -132,86 +112,50 @@ const props = defineProps({
 })
 
 const activeTab = ref('students')
-const showAddStudentDialog = ref(false)
-const showRemoveStudentDialog = ref(false)
-
-// Отфильтровываем уже прикрепленных пользователей
-const availableStudents = computed(() => {
-  const attachedIds = new Set(props.attachedUsers.map(user => user.id))
-  return props.availableUsers.filter(user => !attachedIds.has(user.id))
-})
-
-const addStudentToActivity = async (student) => {
-  try {
-    await axios.post(route('activities.add-student'), {
-      activityId: props.activity.id,
-      studentId: student.id
-    })
-    
-    showAddStudentDialog.value = false
-    
-    // Обновляем список прикрепленных пользователей
-    props.attachedUsers.push(student)
-    
-    $q.notify({
-      type: 'positive',
-      message: 'Ученик успешно добавлен к занятию',
-      position: 'top-right'
-    })
-  } catch (error) {
-    console.error('Ошибка при добавлении ученика:', error)
-    $q.notify({
-      type: 'negative',
-      message: 'Ошибка при добавлении ученика',
-      position: 'top-right'
-    })
-  }
-}
-
-const confirmRemoveStudent = (student) => {
-  $q.dialog({
-    title: 'Подтверждение',
-    message: `Вы действительно хотите удалить ученика ${student.name} из занятия?`,
-    cancel: true,
-    persistent: true,
-    ok: {
-      label: 'Удалить',
-      color: 'negative'
-    },
-    cancel: {
-      label: 'Отмена',
-      color: 'primary'
-    }
-  }).onOk(() => removeStudentFromActivity(student))
-}
-
-const removeStudentFromActivity = async (student) => {
-  try {
-    await axios.post(route('activities.remove-student'), {
-      activityId: props.activity.id,
-      studentId: student.id
-    })
-    
-    // Удаляем ученика из локального списка
-    const index = props.attachedUsers.findIndex(u => u.id === student.id)
-    if (index !== -1) {
-      props.attachedUsers.splice(index, 1)
-    }
-    
-    showRemoveStudentDialog.value = false
-    
-    $q.notify({
-      type: 'positive',
-      message: 'Ученик успешно удален из занятия',
-      position: 'top-right'
-    })
-  } catch (error) {
-    console.error('Ошибка при удалении ученика:', error)
-    $q.notify({
-      type: 'negative',
-      message: 'Ошибка при удалении ученика',
-      position: 'top-right'
-    })
-  }
-}
 </script>
+
+<style scoped>
+.statistics-card {
+  background: #fff;
+  border-radius: 8px;
+  padding: 16px;
+  height: 100%;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+  transition: all 0.3s;
+}
+
+.statistics-card:hover {
+  box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+}
+
+.param-name {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #666;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.param-value {
+  font-size: 1.1rem;
+  color: #333;
+  font-weight: 500;
+}
+
+@media (max-width: 599px) {
+  .statistics-card {
+    text-align: center;
+    padding: 20px;
+  }
+
+  .param-name {
+    font-size: 0.85rem;
+    margin-bottom: 12px;
+  }
+
+  .param-value {
+    font-size: 1rem;
+  }
+}
+</style>

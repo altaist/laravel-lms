@@ -67,7 +67,7 @@
 import { ref, onMounted, computed } from 'vue'
 import { useQuasar } from 'quasar'
 import axios from 'axios'
-import ScheduleList from '@/components/ScheduleList.vue'
+import ScheduleList from '@/modules/lms/components/schedules/ScheduleList.vue'
 
 const $q = useQuasar()
 const teams = ref([])

@@ -8,7 +8,7 @@
 
 <script setup>
 import { ref } from 'vue'
-import AllSchedules from '@/components/AllSchedules.vue'
+import AllSchedules from '@/modules/lms/components/schedules/AllSchedules.vue'
 
 const viewMode = ref('group') // Можно изменить на 'day' по умолчанию, если требуется
 </script>

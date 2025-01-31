@@ -56,10 +56,10 @@ Route::middleware('auth')->group(function () {
         ->name('activities.start');
     Route::post('/activities/{activity}/stop', [ActivityController::class, 'stop'])
         ->name('activities.stop');
-    Route::post('/activities/add-student', [ActivityController::class, 'addStudent'])
-        ->name('activities.add-student');
-    Route::post('/activities/remove-student', [ActivityController::class, 'removeStudent'])
-        ->name('activities.remove-student');
+    Route::post('/activities/add-students', [ActivityController::class, 'addStudents'])
+        ->name('activities.add-students');
+    Route::post('/activities/remove-students', [ActivityController::class, 'removeStudents'])
+        ->name('activities.remove-students');
     Route::post('/activities/{activity}/restart', [ActivityController::class, 'restart'])
         ->name('activities.restart');
     Route::post('/activities', [ActivityController::class, 'store'])

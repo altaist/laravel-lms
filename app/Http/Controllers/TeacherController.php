@@ -177,8 +177,9 @@ class TeacherController extends BaseController
         $teamService = TeamService::make();
         
         // Получаем пользователей текущей группы и группы с id=1
-        $availableUsers = $teamService->getTeamUsers($activity->team_id)
-            ->merge($teamService->getTeamUsers(1));
+        $availableUsers = $teamService->getTeamUsers(1);
+
+        $teamUsers = $teamService->getTeamUsers($activity->team_id);
         
         // Получаем прикрепленных пользователей
         $attachedUsers = $activityService->getActivityUsers($activityId);
@@ -187,7 +188,8 @@ class TeacherController extends BaseController
             'activity' => $activity,
             'team' => $teamService->getTeamById($activity->team_id),
             'attachedUsers' => $attachedUsers,
-            'availableUsers' => $availableUsers
+            'availableUsers' => $availableUsers,
+            'teamUsers' => $teamUsers,
         ]);
     }
 }

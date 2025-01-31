@@ -240,4 +240,44 @@ class ActivityController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Добавить нескольких учеников к активности
+     */
+    public function addStudents(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'activityId' => 'required|exists:activities,id',
+            'studentIds' => 'required|array',
+            'studentIds.*' => 'exists:users,id'
+        ]);
+
+        $this->activityService->addUsersToActivity(
+            $validated['activityId'],
+            $validated['studentIds']
+        );
+
+        return response()->json(['message' => 'Students added successfully']);
+    }
+
+    /**
+     * Удалить нескольких учеников из активности
+     */
+    public function removeStudents(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'activityId' => 'required|exists:activities,id',
+            'studentIds' => 'required|array',
+            'studentIds.*' => 'exists:users,id'
+        ]);
+
+        $this->activityService->removeUsersFromActivity(
+            $validated['activityId'],
+            $validated['studentIds']
+        );
+
+        return response()->json([
+            'message' => 'Students removed successfully'
+        ]);
+    }
 } 

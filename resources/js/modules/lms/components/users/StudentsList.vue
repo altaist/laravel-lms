@@ -1,6 +1,6 @@
 <template>
   <!-- Фильтры -->
-  <div v-if="showSearch && filteredStudents.length > 10" class="row q-gutter-md q-mb-md">
+  <div v-if="showSearch && filteredStudents.length > 0" class="row q-gutter-md q-mb-md">
     <q-input
       dense
       debounce="300"
@@ -12,7 +12,6 @@
         <q-icon name="fa fa-search" />
       </template>
     </q-input>
-    
     <q-select
       v-if="!hideTeams"
       dense
@@ -27,7 +26,6 @@
       class="col"
     />
   </div>
-
   <!-- Список учеников -->
   <q-list bordered separator v-if="filteredStudents.length > 0" >
     <q-item

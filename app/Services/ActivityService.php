@@ -72,7 +72,7 @@ class ActivityService extends BaseService
 
     public function getActivityUsers(int $activityId)
     {
-        return Activity::findOrFail($activityId)->users;
+        return Activity::findOrFail($activityId)->load('users.teams')->users;
     }
 
     /**
@@ -83,7 +83,7 @@ class ActivityService extends BaseService
      */
     public function getTeamActivities(int $teamId): Collection
     {
-        return Activity::with(['users'])->where('team_id', $teamId)
+        return Activity::with(['users.balances', 'users.teams'])->where('team_id', $teamId)
             ->orderBy('starting_at', 'desc')
             ->get();
     }
@@ -168,5 +168,26 @@ class ActivityService extends BaseService
             DB::rollBack();
             throw $e;
         }
+    }
+
+    /**
+     * Добавить нескольких пользователей к активности
+     */
+    public function addUsersToActivity(int $activityId, array $userIds): void
+    {
+        $activity = Activity::findOrFail($activityId);
+        $now = Carbon::now();
+        
+        $attachData = array_fill_keys($userIds, ['attached_at' => $now]);
+        $activity->users()->attach($attachData);
+    }
+
+    /**
+     * Удалить нескольких пользователей из активности
+     */
+    public function removeUsersFromActivity(int $activityId, array $userIds): void
+    {
+        $activity = Activity::findOrFail($activityId);
+        $activity->users()->detach($userIds);
     }
 } 

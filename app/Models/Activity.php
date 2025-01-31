@@ -27,7 +27,7 @@ class Activity extends Model
         'json_content' => 'array',
         'json_results' => 'array',
         'status' => 'integer',
-        'starting_at' => 'datetime',
+        'starting_at' => 'datetime:Y-m-d H:i',
         'started_at' => 'datetime',
         'finished_at' => 'datetime',
         'duration' => 'integer',

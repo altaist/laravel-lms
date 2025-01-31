@@ -168,7 +168,7 @@
                   color="negative"
                   icon="delete"
                   :disable="activity.started_at !== null || activity.finished_at !== null"
-                  @click.stop="deleteActivity(activity.id)"
+                  @click.stop="confirmDeleteActivity(activity)"
                 >
                   <q-tooltip>Удалить занятие</q-tooltip>
                 </q-btn>
@@ -191,39 +191,11 @@
 
     <!-- Диалог добавления активности -->
     <q-dialog v-model="showAddDialog">
-      <q-card style="min-width: 350px">
-        <q-card-section>
-          <div class="text-h6">Добавить занятие</div>
-        </q-card-section>
-
-        <q-card-section>
-          <q-select
-            v-model="newActivity.schedule_id"
-            :options="team.schedule_days"
-            :option-label="(schedule) => schedule ? `${daysMap[schedule.day_of_week]}: ${formatTime(schedule.start_time)} - ${formatTime(schedule.end_time)}` : ''"
-            option-value="id"
-            label="Выберите расписание"
-            class="q-mb-md"
-            @update:model-value="onScheduleSelect"
-          />
-          <q-input
-            v-model="newActivity.starting_at"
-            type="datetime-local"
-            label="Дата и время начала"
-            class="q-mb-md"
-          />
-          <q-input
-            v-model="newActivity.description"
-            type="textarea"
-            label="Описание"
-          />
-        </q-card-section>
-
-        <q-card-actions align="right">
-          <q-btn flat label="Отмена" v-close-popup />
-          <q-btn flat label="Сохранить" @click="saveActivity" />
-        </q-card-actions>
-      </q-card>
+      <activity-form
+        :schedule-days="team.schedule_days"
+        @save="saveActivity"
+        @cancel="showAddDialog = false"
+      />
     </q-dialog>
   </page-layout>
 </template>
@@ -233,8 +205,9 @@ import { ref, computed } from 'vue'
 import { router } from '@inertiajs/vue3'
 import { date, useQuasar } from 'quasar'
 import StudentsList from '@/modules/lms/components/users/StudentsList.vue'
-import ScheduleList from '@/components/ScheduleList.vue'
-import ScheduleEditDialog from '@/components/ScheduleEditDialog.vue'
+import ScheduleList from '@/modules/lms/components/schedules/ScheduleList.vue'
+import ScheduleEditDialog from '@/modules/lms/components/schedules/ScheduleEditDialog.vue'
+import ActivityForm from '@/modules/lms/components/activities/ActivityForm.vue'
 import axios from 'axios'
 
 const $q = useQuasar()
@@ -350,38 +323,17 @@ const updateScheduleDays = (newDays) => {
   }
 }
 
-const getDefaultStartTime = () => {
-  const date = new Date()
-  date.setHours(date.getHours() + 1)
-  date.setMinutes(0)
-  date.setSeconds(0)
-  return date.toISOString().slice(0, 16)
-}
-
-const newActivity = ref({
-  starting_at: getDefaultStartTime(),
-  name: '',
-  description: '',
-  schedule_id: null
-})
-
-const saveActivity = async () => {
+const saveActivity = async (formData) => {
   try {
     await axios.post(route('activities.store'), {
       team_id: props.team.id,
-      name: newActivity.value.name || 'Новое занятие ' + newActivity.value.starting_at,
-      starting_at: newActivity.value.starting_at,
-      description: newActivity.value.description,
+      name: formData.name,
+      starting_at: formData.starting_at,
+      description: formData.description,
       duration: 60
     })
     
     showAddDialog.value = false
-    newActivity.value = { 
-      starting_at: getDefaultStartTime(),
-      name: '',
-      description: '',
-      schedule_id: null
-    }
     
     // Обновляем страницу через Inertia
     router.reload({ only: ['activities'] })
@@ -400,99 +352,44 @@ const saveActivity = async () => {
   }
 }
 
-const deleteActivity = async (activityId) => {
-  try {
-    $q.dialog({
-      title: 'Подтверждение',
-      message: 'Вы действительно хотите удалить это занятие?',
-      cancel: true,
-      persistent: true,
-      ok: {
-        label: 'Удалить',
-        color: 'negative'
-      },
-      cancel: {
-        label: 'Отмена',
-        color: 'primary'
-      }
-    }).onOk(async () => {
-      console.log('Удаление занятия')
-      try {
-        await axios.delete(route('activities.destroy', activityId))
-        
-        // Обновляем страницу через Inertia
-        router.reload({ only: ['activities'] })
-        
-        $q.notify({
-          type: 'positive',
-          message: 'Занятие успешно удалено',
-          position: 'top-right'
-        })
-      } catch (error) {
-        $q.notify({
-          type: 'negative',
-          message: 'Ошибка при удалении занятия',
-          position: 'top-right'
-        })
-      }
-    })
-  } catch (error) {
-    console.error('Ошибка при показе диалога:', error)
-  }
-}
-
-// Добавляем мапинг дней недели
-const daysMap = {
-  1: 'Понедельник',
-  2: 'Вторник',
-  3: 'Среда',
-  4: 'Четверг',
-  5: 'Пятница',
-  6: 'Суббота',
-  7: 'Воскресенье'
-}
-
-// Функция форматирования времени
-const formatTime = (dateTimeString) => {
-  if (!dateTimeString) return ''
-  return dateTimeString.split(' ')[1]?.substring(0, 5) || dateTimeString
-}
-
-const onScheduleSelect = (scheduleItem) => {
-  const selectedSchedule = props.team.schedule_days.find(s => s.id === scheduleItem.id)
-  if (selectedSchedule) {
-    const now = new Date()
-    const targetDay = parseInt(selectedSchedule.day_of_week)
-    const [hours, minutes] = formatTime(selectedSchedule.start_time).split(':')
-    
-    // Создаем дату на основе выбранного расписания
-    let targetDate = new Date()
-    targetDate.setHours(parseInt(hours), parseInt(minutes), 0, 0)
-    
-    const currentDay = now.getDay()
-    const adjustedCurrentDay = currentDay === 0 ? 7 : currentDay
-    
-    let daysUntilTarget = targetDay - adjustedCurrentDay
-    
-    if (daysUntilTarget < 0 || (daysUntilTarget === 0 && targetDate < now)) {
-      daysUntilTarget += 7
+const confirmDeleteActivity = (activity) => {
+  $q.dialog({
+    title: 'Подтверждение',
+    message: `Вы действительно хотите удалить занятие "${activity.name}"?`,
+    cancel: true,
+    persistent: true,
+    ok: {
+      label: 'Удалить',
+      color: 'negative'
+    },
+    cancel: {
+      label: 'Отмена',
+      color: 'primary'
     }
-    
-    targetDate.setDate(targetDate.getDate() + daysUntilTarget)
-    
-    // Форматируем дату без учета временной зоны
-    const year = targetDate.getFullYear()
-    const month = String(targetDate.getMonth() + 1).padStart(2, '0')
-    const day = String(targetDate.getDate()).padStart(2, '0')
-    const formattedHours = String(targetDate.getHours()).padStart(2, '0')
-    const formattedMinutes = String(targetDate.getMinutes()).padStart(2, '0')
-    
-    newActivity.value = {
-      ...newActivity.value,
-      starting_at: `${year}-${month}-${day}T${formattedHours}:${formattedMinutes}`,
-      schedule_id: scheduleItem
+  }).onOk(async () => {
+    try {
+      await axios.delete(route('activities.destroy', activity.id))
+      
+      // Обновляем локальный список активностей
+      const index = props.activities.findIndex(a => a.id === activity.id)
+      if (index !== -1) {
+        props.activities.splice(index, 1)
+      }
+      
+      $q.notify({
+        type: 'positive',
+        message: 'Занятие успешно удалено',
+        position: 'top-right'
+      })
+    } catch (error) {
+      console.error('Ошибка при удалении занятия:', error)
+      $q.notify({
+        type: 'negative',
+        message: 'Ошибка при удалении занятия',
+        position: 'top-right'
+      })
     }
-  }
+  })
 }
 </script>
 

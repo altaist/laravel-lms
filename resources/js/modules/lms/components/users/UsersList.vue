@@ -17,8 +17,9 @@
       <q-item v-for="user in filteredUsers" :key="user.id">
         <q-item-section>
           <q-item-label>{{ user.last_name }} {{ user.first_name }}</q-item-label>
-          <q-item-label caption>
-            Последний платеж: {{ formatDate(user.last_payment_date) }}
+          <q-item-label caption lines="2">
+            <div>Последний платеж: {{ formatDate(user.last_payment_date) }}</div>
+            <div>Группы: {{ formatTeams(user.teams) }}</div>
           </q-item-label>
         </q-item-section>
 
@@ -63,6 +64,11 @@ const filteredUsers = computed(() => {
 const formatDate = (dateString) => {
   if (!dateString) return 'Нет данных'
   return date.formatDate(dateString, 'DD.MM.YYYY')
+}
+
+const formatTeams = (teams) => {
+  if (!teams || teams.length === 0) return 'Нет групп'
+  return teams.map(team => team.name).join(', ')
 }
 
 const getLessonsClass = (lessons) => {
