@@ -5,7 +5,9 @@
             :left-btn-icon="leftBtnIcon"
             :left-btn-route="leftBtnRoute"
             :left-btn-go-back="leftBtnGoBack"
-            
+            :right-btn-icon="rightBtnIcon"
+            :right-btn-route="rightBtnRoute"
+
             @click:left="emit('click:header:left')"
             @click:right="emit('click:header:right')"
             />
@@ -65,11 +67,9 @@ const props = defineProps({
     },
     rightBtnIcon: {
         type: String,
-        default: 'fa-solid fa-user'
     },
     rightBtnRoute: {
         type: String,
-        default: 'dashboard'
     },
 });
 

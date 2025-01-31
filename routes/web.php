@@ -52,6 +52,12 @@ Route::middleware('auth')->group(function () {
         ->name('teams.schedules.all');
     Route::get('/teams/all-schedules',[TeacherController::class, 'schedules'])->name('teams.schedules.all.view');
 
+    Route::post('/activities', [ActivityController::class, 'store'])
+        ->name('activities.store');
+    Route::put('/activities/{activity}', [ActivityController::class, 'update'])
+        ->name('activities.update');
+    Route::delete('/activities/{id}', [ActivityController::class, 'destroy'])
+        ->name('activities.destroy');
     Route::post('/activities/{activity}/start', [ActivityController::class, 'start'])
         ->name('activities.start');
     Route::post('/activities/{activity}/stop', [ActivityController::class, 'stop'])
@@ -62,10 +68,6 @@ Route::middleware('auth')->group(function () {
         ->name('activities.remove-students');
     Route::post('/activities/{activity}/restart', [ActivityController::class, 'restart'])
         ->name('activities.restart');
-    Route::post('/activities', [ActivityController::class, 'store'])
-        ->name('activities.store');
-    Route::delete('/activities/{id}', [ActivityController::class, 'destroy'])
-        ->name('activities.destroy');
 });
 
 require __DIR__.'/auth.php';

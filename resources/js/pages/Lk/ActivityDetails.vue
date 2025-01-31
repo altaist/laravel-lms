@@ -1,5 +1,9 @@
 <template>
-  <page-layout title="Занятие">
+  <page-layout 
+    title="Занятие"
+    right-btn-icon="fa-solid fa-pen"
+    @click:header:right="showEditDialog = true"
+  >
     <!-- Панель активности -->
     <activity-panel :activity="activity" class="q-my-md"/>
 
@@ -80,6 +84,17 @@
         </div>
       </q-tab-panel>
     </q-tab-panels>
+
+    <!-- Диалог редактирования -->
+    <q-dialog v-model="showEditDialog">
+      <activity-form
+        :activity="activity"
+        :schedule-days="scheduleDays"
+        title="Редактировать занятие"
+        @save="handleEditActivity"
+        @cancel="showEditDialog = false"
+      />
+    </q-dialog>
   </page-layout>
 </template>
 
@@ -87,6 +102,12 @@
 import { ref } from 'vue'
 import ActivityPanel from '@/modules/lms/components/activities/ActivityPanel.vue'
 import ActivityUsers from '@/modules/lms/components/activities/ActivityUsers.vue'
+import ActivityForm from '@/modules/lms/components/activities/ActivityForm.vue'
+import { useQuasar } from 'quasar'
+
+const $q = useQuasar()
+const showEditDialog = ref(false)
+const activeTab = ref('students')
 
 const props = defineProps({
   activity: {
@@ -108,10 +129,35 @@ const props = defineProps({
   availableUsers: {
     type: Array,
     required: true
+  },
+  scheduleDays: {
+    type: Array,
+    required: true
   }
 })
 
-const activeTab = ref('students')
+const handleEditActivity = async (formData) => {
+  try {
+    await axios.put(route('activities.update', formData.id), formData)
+    showEditDialog.value = false
+    
+    $q.notify({
+      type: 'positive',
+      message: 'Занятие успешно обновлено',
+      position: 'top-right'
+    })
+    
+    // Обновляем данные на странице
+    window.location.reload()
+  } catch (error) {
+    console.error('Ошибка при обновлении занятия:', error)
+    $q.notify({
+      type: 'negative',
+      message: 'Ошибка при обновлении занятия',
+      position: 'top-right'
+    })
+  }
+}
 </script>
 
 <style scoped>

@@ -6,6 +6,7 @@
 
     <q-card-section>
       <q-select
+        v-if="!isEditing"
         v-model="form.schedule_id"
         :options="scheduleDays"
         :option-label="(schedule) => schedule ? `${daysMap[schedule.day_of_week]}: ${formatTime(schedule.start_time)} - ${formatTime(schedule.end_time)}` : ''"
@@ -29,13 +30,13 @@
 
     <q-card-actions align="right">
       <q-btn flat label="Отмена" @click="$emit('cancel')" />
-      <q-btn flat label="Сохранить" @click="save" />
+      <q-btn flat label="Сохранить" @click="save" color="primary" />
     </q-card-actions>
   </q-card>
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, onMounted } from 'vue'
 import { date } from 'quasar'
 
 const props = defineProps({
@@ -46,10 +47,16 @@ const props = defineProps({
   title: {
     type: String,
     default: 'Добавить занятие'
+  },
+  activity: {
+    type: Object,
+    default: null
   }
 })
 
 const emit = defineEmits(['save', 'cancel'])
+
+const isEditing = ref(false)
 
 const daysMap = {
   1: 'Понедельник',
@@ -74,6 +81,18 @@ const form = ref({
   name: '',
   description: '',
   schedule_id: null
+})
+
+onMounted(() => {
+  if (props.activity) {
+    isEditing.value = true
+    form.value = {
+      starting_at: props.activity.starting_at?.slice(0, 16) || getDefaultStartTime(),
+      name: props.activity.name || '',
+      description: props.activity.description || '',
+      schedule_id: props.activity.schedule_id || null
+    }
+  }
 })
 
 const formatTime = (dateTimeString) => {
@@ -110,7 +129,7 @@ const onScheduleSelect = (scheduleItem) => {
     
     form.value = {
       ...form.value,
-      starting_at: `${year}-${month}-${day} ${formattedHours}:${formattedMinutes}`,
+      starting_at: `${year}-${month}-${day}T${formattedHours}:${formattedMinutes}`,
       schedule_id: scheduleItem
     }
   }
@@ -119,7 +138,8 @@ const onScheduleSelect = (scheduleItem) => {
 const save = () => {
   emit('save', {
     ...form.value,
-    name: form.value.name || 'Новое занятие ' + form.value.starting_at
+    name: form.value.name || 'Новое занятие ' + form.value.starting_at,
+    id: props.activity?.id
   })
 }
 </script> 
