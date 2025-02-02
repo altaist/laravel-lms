@@ -1,6 +1,8 @@
 <template>
   <page-layout
     title="Студент"
+    right-btn-icon="fa-solid fa-pen"
+    @click:header:right="showEditDialog = true"
   >
     <div class="q-pa-md">
       
@@ -40,10 +42,11 @@
       </q-card>
       
       <q-tabs v-model="tab" class="q-mb-md">
-        <q-tab name="info" label="Инфо" />
-        <q-tab name="teams" label="Команды" />
+        <q-tab name="groups" label="Группы" />
         <q-tab name="activities" label="Занятия" />
         <q-tab name="payments" label="Платежи" />
+        <q-tab name="info" label="Инфо" />
+        <q-tab name="teams" label="Команды" />
       </q-tabs>
 
       <q-tab-panels v-model="tab" class="q-px-none">
@@ -58,27 +61,36 @@
             />
           </div>
         </q-tab-panel>
+        <q-tab-panel name="groups" class="q-pa-none">
+          <q-list separator class="full-width">
+            <q-item
+              v-for="team in student.teams"
+              :key="team.id"
+              clickable
+              v-ripple
+              @click="() => router.visit(route('teacher.team.details', team.id))"
+            >
+              <q-item-section>
+                <q-item-label>{{ team.name }}</q-item-label>
+                <q-item-label caption>
+                  Количество учеников: {{ team.students_count || 0 }}
+                </q-item-label>
+              </q-item-section>
+              <q-item-section side>
+                <q-icon name="chevron_right" color="grey" />
+              </q-item-section>
+            </q-item>
+            <q-item v-if="!student.teams?.length">
+              <q-item-section>
+                <q-item-label class="text-grey">
+                  Студент не состоит ни в одной группе
+                </q-item-label>
+              </q-item-section>
+            </q-item>
+          </q-list>
+        </q-tab-panel>
         <q-tab-panel name="teams" class="q-pa-sm">
           <q-card>
-            <q-card-section>
-              <div class="text-h6">Группы ученика</div>
-              <q-list>
-                <q-item v-for="team in student.teams" :key="team.id">
-                  <q-item-section>
-                    <div>{{ team.name }}</div>
-                    <div class="text-caption">{{ team.schedule }}</div>
-                  </q-item-section>
-                  <q-item-section side>
-                    <q-toggle
-                      v-model="team.selected"
-                      @update:model-value="(val) => toggleTeamMembership(team.id, val)"
-                      color="primary"
-                    />
-                  </q-item-section>
-                </q-item>
-              </q-list>
-            </q-card-section>
-          </q-card><q-card>
             <q-card-section>
               <div class="text-h6">Все группы</div>
               <q-list>
@@ -100,18 +112,17 @@
           </q-card>
         </q-tab-panel>
         <q-tab-panel name="activities" class="q-pa-sm">
-          <q-card>
-            <q-card-section>
+
               <div class="text-h6">Занятия</div>
               <q-list>
-                <q-item v-for="activity in activities" :key="activity.id">
+                <q-item v-for="activity in activities" :key="activity.id" 
+                clickable v-ripple @click="() => router.visit(route('teacher.activity.details', activity.id))">
                   <q-item-section>
                     {{ activity.name }} - {{ activity.date }}
                   </q-item-section>
                 </q-item>
               </q-list>
-            </q-card-section>
-          </q-card>
+
         </q-tab-panel>
         <q-tab-panel name="payments" class="q-pa-sm">
           <div class="q-mb-md">
@@ -158,7 +169,7 @@ const props = defineProps({
   payments: Array,
 })
 
-const tab = ref('info')
+const tab = ref('groups')
 const showEditDialog = ref(false)
 const showNewPaymentDialog = ref(false)
 
