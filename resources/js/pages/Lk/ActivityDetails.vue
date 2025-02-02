@@ -12,6 +12,7 @@
       v-model="activeTab"
       class="text-primary"
       align="left"
+      @update:model-value="handleTabChange"
     >
       <q-tab name="students" label="Ученики" />
       <q-tab name="content" label="Контент" />
@@ -99,7 +100,8 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
+import { router } from '@inertiajs/vue3'
 import ActivityPanel from '@/modules/lms/components/activities/ActivityPanel.vue'
 import ActivityUsers from '@/modules/lms/components/activities/ActivityUsers.vue'
 import ActivityForm from '@/modules/lms/components/activities/ActivityForm.vue'
@@ -131,10 +133,19 @@ const props = defineProps({
     required: true
   },
   scheduleDays: {
-    type: Array,
-    required: true
+    type: Array
   }
 })
+
+const handleTabChange = (tab) => {
+  if (tab === 'results') {
+    router.reload({ 
+      only: ['activity', 'attachedUsers'],
+      preserveScroll: true,
+      preserveState: true 
+    })
+  }
+}
 
 const handleEditActivity = async (formData) => {
   try {

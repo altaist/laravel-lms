@@ -59,10 +59,15 @@ class ActivityController extends Controller
     {
         $validated = $request->validate([
             'team_id' => 'sometimes|exists:teams,id',
-            'description' => 'sometimes|string',
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
             'info' => 'nullable|array',
             'starting_at' => 'sometimes|date',
             'duration' => 'sometimes|integer|min:1',
+        ], [
+            'name.required' => 'Название занятия обязательно для заполнения',
+            'name.string' => 'Название должно быть текстом',
+            'name.max' => 'Название не должно превышать 255 символов',
         ]);
 
         $activity = $this->activityService->updateActivity($id, $validated);

@@ -16,6 +16,12 @@
         @update:model-value="onScheduleSelect"
       />
       <q-input
+        v-model="form.name"
+        label="Название *"
+        :rules="[val => !!val || 'Название обязательно для заполнения']"
+        class="q-mb-md"
+      />
+      <q-input
         v-model="form.starting_at"
         type="datetime-local"
         label="Дата и время начала"
@@ -24,7 +30,7 @@
       <q-input
         v-model="form.description"
         type="textarea"
-        label="Описание"
+        label="Описание (необязательно)"
       />
     </q-card-section>
 
@@ -36,13 +42,16 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { date } from 'quasar'
+import { ref, onMounted, watch } from 'vue'
+import { date, useQuasar } from 'quasar'
+
+const $q = useQuasar()
 
 const props = defineProps({
   scheduleDays: {
     type: Array,
-    required: true
+    default: () => [],
+    required: false
   },
   title: {
     type: String,
@@ -50,7 +59,7 @@ const props = defineProps({
   },
   activity: {
     type: Object,
-    default: null
+    default: () => null
   }
 })
 
@@ -76,6 +85,18 @@ const getDefaultStartTime = () => {
   return date.toISOString().slice(0, 16)
 }
 
+const generateDefaultName = (startingAt) => {
+  const dateObj = new Date(startingAt)
+  const formattedDate = dateObj.toLocaleString('ru-RU', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  })
+  return `Новое занятие ${formattedDate}`
+}
+
 const form = ref({
   starting_at: getDefaultStartTime(),
   name: '',
@@ -92,6 +113,14 @@ onMounted(() => {
       description: props.activity.description || '',
       schedule_id: props.activity.schedule_id || null
     }
+  } else {
+    form.value.name = generateDefaultName(form.value.starting_at)
+  }
+})
+
+watch(() => form.value.starting_at, (newValue) => {
+  if (!isEditing.value && !form.value.name.includes('Изменено:')) {
+    form.value.name = generateDefaultName(newValue)
   }
 })
 
@@ -135,11 +164,37 @@ const onScheduleSelect = (scheduleItem) => {
   }
 }
 
-const save = () => {
-  emit('save', {
-    ...form.value,
-    name: form.value.name || 'Новое занятие ' + form.value.starting_at,
-    id: props.activity?.id
-  })
+const save = async () => {
+  try {
+    if (!form.value.name?.trim()) {
+      $q.notify({
+        type: 'negative',
+        message: 'Название занятия обязательно для заполнения',
+        position: 'top-right'
+      })
+      return
+    }
+
+    emit('save', {
+      ...form.value,
+      name: form.value.name.trim(),
+      id: props.activity?.id
+    })
+  } catch (error) {
+    let errorMessage = 'Произошла ошибка при сохранении'
+    
+    if (error.response?.data?.errors) {
+      // Получаем первую ошибку из ответа сервера
+      errorMessage = Object.values(error.response.data.errors)[0][0]
+    } else if (error.response?.data?.message) {
+      errorMessage = error.response.data.message
+    }
+
+    $q.notify({
+      type: 'negative',
+      message: errorMessage,
+      position: 'top-right'
+    })
+  }
 }
 </script> 
