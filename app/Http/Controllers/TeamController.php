@@ -84,4 +84,30 @@ class TeamController extends Controller
 
         return response()->json($teams);
     }
+
+    public function update(Request $request, Team $team)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255|unique:teams,name,' . $team->id,
+            'description' => 'nullable|string|max:1000',
+        ], [
+            'name.required' => 'Название команды обязательно',
+            'name.max' => 'Название команды не должно превышать 255 символов',
+            'name.unique' => 'Команда с таким названием уже существует',
+            'description.max' => 'Описание не должно превышать 1000 символов',
+        ]);
+
+        try {
+            $updatedTeam = $this->teamService->updateTeam($team->id, $validated);
+            return response()->json([
+                'message' => 'Команда успешно обновлена',
+                'team' => $updatedTeam
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Ошибка при обновлении команды',
+                'errors' => ['general' => [$e->getMessage()]]
+            ], 500);
+        }
+    }
 } 

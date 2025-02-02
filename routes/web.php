@@ -68,6 +68,8 @@ Route::middleware('auth')->group(function () {
         ->name('activities.remove-students');
     Route::post('/activities/{activity}/restart', [ActivityController::class, 'restart'])
         ->name('activities.restart');
+
+    Route::put('/teams/{team}', [TeamController::class, 'update'])->name('teams.update');
 });
 
 require __DIR__.'/auth.php';

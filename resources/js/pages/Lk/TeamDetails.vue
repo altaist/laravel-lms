@@ -1,5 +1,9 @@
 <template>
-  <page-layout title="Группа">
+  <page-layout 
+    title="Группа"
+    right-btn-icon="fa-solid fa-pen"
+    @click:header:right="showEditDialog = true"
+  >
     <!-- Заголовок группы -->
     <div class="q-pa-md">
       <div class="text-h4">{{ team.name }}</div>
@@ -197,6 +201,16 @@
         @cancel="showAddDialog = false"
       />
     </q-dialog>
+
+    <!-- Добавляем диалог редактирования -->
+    <q-dialog v-model="showEditDialog">
+      <team-form
+        :team="team"
+        title="Редактировать команду"
+        @save="handleEditTeam"
+        @cancel="showEditDialog = false"
+      />
+    </q-dialog>
   </page-layout>
 </template>
 
@@ -208,6 +222,7 @@ import StudentsList from '@/modules/lms/components/users/StudentsList.vue'
 import ScheduleList from '@/modules/lms/components/schedules/ScheduleList.vue'
 import ScheduleEditDialog from '@/modules/lms/components/schedules/ScheduleEditDialog.vue'
 import ActivityForm from '@/modules/lms/components/activities/ActivityForm.vue'
+import TeamForm from '@/modules/lms/components/teams/TeamForm.vue'
 import axios from 'axios'
 
 const $q = useQuasar()
@@ -240,6 +255,7 @@ const showAddStudentDialog = ref(false)
 const showRemoveStudentDialog = ref(false)
 const showScheduleEdit = ref(false)
 const showAddDialog = ref(false)
+const showEditDialog = ref(false)
 
 const availableStudents = computed(() => {
   const currentUserIds = new Set(props.users.map(user => user.id))
@@ -390,6 +406,35 @@ const confirmDeleteActivity = (activity) => {
       })
     }
   })
+}
+
+const handleEditTeam = async (formData) => {
+  try {
+    const response = await axios.put(route('teams.update', props.team.id), formData)
+    showEditDialog.value = false
+    
+    $q.notify({
+      type: 'positive',
+      message: response.data.message || 'Команда успешно обновлена',
+      position: 'top-right'
+    })
+    
+    router.reload({ only: ['team'] })
+  } catch (error) {
+    console.error('Ошибка при обновлении команды:', error)
+    
+    const errorMessage = error.response?.data?.message 
+      || 'Ошибка при обновлении команды'
+    
+    $q.notify({
+      type: 'negative',
+      message: errorMessage,
+      position: 'top-right'
+    })
+    
+    // Прокидываем ошибку дальше для обработки в форме
+    throw error
+  }
 }
 </script>
 
