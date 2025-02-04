@@ -26,7 +26,7 @@ class TeacherController extends BaseController
         $activityService = ActivityService::make();
         $activities = $activityService->getAllActivities();
 
-        $teacher = ['name' => 'John Doe'];
+        $teacher = ['name' => 'Преподаватель'];
 
         $data = [
             'teacher' => $teacher,

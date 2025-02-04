@@ -1,8 +1,7 @@
 <template>
   <page-layout-home 
-    title="ПРИЛОЖЕНИЕ"
+    title="ROBOT 04"
     footer-text="Контакты"
-
   >
     <!-- Панель с именем преподавателя -->
     <div class="text-h5 q-my-xl text-center">
