@@ -19,10 +19,11 @@
         v-for="team in filteredTeams"
         :key="team.id"
         clickable
+        class="q-px-sm q-my-md"
         @click="router.visit(route('teacher.team.details', team.id))"
       >
         <q-item-section>
-          <q-item-label class="text-weight-bold">{{ team.name }}</q-item-label>
+          <q-item-label >{{ team.name }}</q-item-label>
           <!-- Удалено отображение типа команды -->
           <!-- <q-item-label caption>
             Тип: {{ team.type || 'Не указан' }}

@@ -2,12 +2,17 @@
   <q-chip
     :color="getBalanceColor(balance)"
     text-color="white"
-    size="lg"
+    size="md"
     class="text-weight-bold"
     rounded
+    v-if="viewMode==1"
   >
     {{ balance }}
   </q-chip>
+  <div v-else>
+    {{ balance }}
+  </div>
+
 </template>
 
 <script setup>
@@ -15,6 +20,10 @@ const props = defineProps({
   balance: {
     type: Number,
     default: 0
+  },
+  viewMode: {
+    typee: Number,
+    default: 1
   }
 })
 

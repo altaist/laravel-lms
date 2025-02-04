@@ -12,8 +12,9 @@
         <q-icon name="fa fa-search" />
       </template>
     </q-input>
+
     <q-select
-      v-if="!hideTeams"
+      v-if="!hideTeamsFilter"
       dense
       v-model="selectedTeam"
       :options="teamOptions"
@@ -95,6 +96,10 @@ const props = defineProps({
     required: true
   },
   hideTeams: {
+    type: Boolean,
+    default: false
+  },
+  hideTeamsFilter: {
     type: Boolean,
     default: false
   },

@@ -4,7 +4,7 @@
     footer-text="Контакты"
     :left-btn-go-back="true"
   >
-    <div class="q-pa-md">
+    <div class="q-py-md">
       <!-- Фильтр по группе -->
       <q-select
         v-model="selectedTeam"

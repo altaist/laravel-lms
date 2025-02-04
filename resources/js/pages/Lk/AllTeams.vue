@@ -1,6 +1,6 @@
 <template>
   <page-layout title="Группы">
-    <div class="q-pa-md">
+    <div class="q-py-md">
       <teams-list :teams="teams" />
     </div>
   </page-layout>

@@ -4,7 +4,7 @@
     footer-text="Контакты"
     :left-btn-go-back="true"
   >
-    <div class="q-pa-md">
+    <div class="q-py-md">
       <students-list
         :students="students"
         :teams="teams"
