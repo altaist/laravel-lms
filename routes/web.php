@@ -6,6 +6,7 @@ use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\TeamController;
 use App\Http\Controllers\ActivityController;
+use App\Http\Controllers\CreditController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -70,6 +71,9 @@ Route::middleware('auth')->group(function () {
         ->name('activities.restart');
 
     Route::put('/teams/{team}', [TeamController::class, 'update'])->name('teams.update');
+    Route::get('/credits/user/{userId}', [CreditController::class, 'getUserCredits'])->name('credits.user');
+    Route::post('/credits/manual', [CreditController::class, 'storeManual'])->name('credits.manual');
+
 });
 
 require __DIR__.'/auth.php';

@@ -6,6 +6,8 @@ use App\Models\Role;
 use App\Models\Coin;
 use App\Models\Reason;
 use Illuminate\Database\Seeder;
+use App\Enums\CreditReasonEnum;
+use Illuminate\Support\Facades\DB;
 
 class DictSeeder extends Seeder
 {
@@ -63,31 +65,37 @@ class DictSeeder extends Seeder
         }
 
         // Причины
-        $reasons = [
+        DB::table('reasons')->insertOrIgnore([
             [
-                'id' => 1,
+                'id' => CreditReasonEnum::LESSON->value,
                 'name' => 'Занятие',
-                'description' => 'Посещение занятия'
+                'description' => 'Посещение занятия',
             ],
             [
-                'id' => 2,
+                'id' => CreditReasonEnum::ILLNESS->value,
                 'name' => 'Болезнь',
-                'description' => 'Отсутствие по болезни'
+                'description' => 'Отсутствие по болезни',
             ],
             [
-                'id' => 3,
+                'id' => CreditReasonEnum::LESSON_ACHIEVEMENT->value,
                 'name' => 'Достижение на уроке',
-                'description' => 'Достижения полученные во время занятия'
+                'description' => 'Достижения полученные во время занятия',
             ],
             [
-                'id' => 4,
+                'id' => CreditReasonEnum::ADDITIONAL_ACHIEVEMENT->value,
                 'name' => 'Дополнительное достижение',
-                'description' => 'Дополнительные достижения вне занятий'
+                'description' => 'Дополнительные достижения вне занятий',
             ],
-        ];
-
-        foreach ($reasons as $reason) {
-            Reason::create($reason);
-        }
+            [
+                'id' => CreditReasonEnum::PAYMENT->value,
+                'name' => 'Платеж',
+                'description' => 'Начисление за платеж',
+            ],
+            [
+                'id' => CreditReasonEnum::MANUAL_ADJUSTMENT->value,
+                'name' => 'Ручная корректировка',
+                'description' => 'Ручная корректировка баланса',
+            ],
+        ]);
     }
 } 

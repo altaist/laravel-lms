@@ -7,6 +7,7 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
+use App\Enums\CreditReasonEnum;
 
 class ActivityService extends BaseService
 {
@@ -139,7 +140,7 @@ class ActivityService extends BaseService
             userId: $user->id,
             creditCoinId: 2, // Фиксированный coin_id для кредитов активности
             creditValue: -abs($creditValue), // Гарантируем отрицательное значение
-            reasonId: 2 // Предполагаем, что есть reason_id для списания за активность
+            reasonId: CreditReasonEnum::LESSON->value // Используем код причины "Занятие"
         );
     }
 

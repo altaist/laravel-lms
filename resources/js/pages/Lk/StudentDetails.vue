@@ -125,22 +125,62 @@
 
         </q-tab-panel>
         <q-tab-panel name="payments" class="q-pa-sm">
-          <div class="q-mb-md">
-            <q-btn
-              color="primary"
-              icon="add"
-              label="Новый платеж"
-              @click="showNewPaymentDialog = true"
-            />
+          <div class="row q-col-gutter-sm">
+            <div class="col-6">
+              <q-btn
+                color="primary"
+                icon="add"
+                label="Новый платеж"
+                stack
+                class="full-width"
+                @click="showNewPaymentDialog = true"
+              />
+            </div>
+            <div class="col-6">
+              <q-btn
+                color="primary"
+                icon="add_circle"
+                label="Корректировка начислений"
+                stack
+                class="full-width"
+                @click="showNewCreditDialog = true"
+              />
+            </div>
+            <div class="col-6">
+              <q-btn
+                color="secondary"
+                icon="history"
+                label="История начислений"
+                stack
+                class="full-width"
+                @click="loadCreditsAndShowDialog"
+              />
+            </div>
+          </div>
+          <div class="q-mt-lg">
+            <div class="text-h6 q-mb-md">Платежи</div>
+            <payments-list :payments="payments" />
           </div>
           
-          <payments-list :payments="payments" />
 
           <!-- Диалог нового платежа -->
           <q-dialog v-model="showNewPaymentDialog">
             <new-payment-dialog
               :user="student"
               @saved="onPaymentSaved"
+            />
+          </q-dialog>
+
+          <!-- Диалог истории начислений -->
+          <q-dialog v-model="showCreditsDialog">
+            <user-credits-dialog :credits="userCredits" />
+          </q-dialog>
+
+          <q-dialog v-model="showNewCreditDialog">
+            <new-credit-dialog
+              :user="student"
+              :coins="coins"
+              @saved="onCreditSaved"
             />
           </q-dialog>
         </q-tab-panel>
@@ -161,17 +201,23 @@ import { router } from '@inertiajs/vue3'
 import { date } from 'quasar'
 import PaymentsList from '@/modules/lms/components/payments/PaymentsList.vue'
 import NewPaymentDialog from '@/modules/lms/components/lk/teacher/NewPaymentDialog.vue'
+import UserCreditsDialog from '@/modules/lms/components/credits/UserCreditsDialog.vue'
+import NewCreditDialog from '@/modules/lms/components/credits/NewCreditDialog.vue'
 
 const props = defineProps({
   student: Object,
   teams: Array,
   activities: Array,
   payments: Array,
+  coins: Array,
 })
 
 const tab = ref('groups')
 const showEditDialog = ref(false)
 const showNewPaymentDialog = ref(false)
+const showCreditsDialog = ref(false)
+const showNewCreditDialog = ref(false)
+const userCredits = ref([])
 
 const getBalance = (student) => {
   const balance = student.balances?.find(b => b.coin_id === 2)
@@ -192,6 +238,22 @@ const onUserEdited = () => {
 const onPaymentSaved = () => {
   showNewPaymentDialog.value = false;
   router.reload({ only: ['payments'] });
+}
+
+const onCreditSaved = () => {
+  showNewCreditDialog.value = false
+  router.reload({ only: ['student'] })
+}
+
+const loadCreditsAndShowDialog = async () => {
+  try {
+    const response = await fetch(route('credits.user', props.student.id))
+    const data = await response.json()
+    userCredits.value = data
+    showCreditsDialog.value = true
+  } catch (error) {
+    console.error('Ошибка при загрузке кредитов:', error)
+  }
 }
 
 // Функция форматирования телефона

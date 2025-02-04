@@ -26,6 +26,7 @@ class CreditService extends BaseService
     {
         return Credit::where('user_id', $userId)
             ->with(['author', 'coin', 'reason', 'creditable'])
+            ->orderBy('created_at', 'desc')
             ->get();
     }
 

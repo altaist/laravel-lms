@@ -7,6 +7,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use App\Services\BalanceService;
 use Illuminate\Support\Facades\DB;
+use App\Enums\CreditReasonEnum;
 
 class PaymentService extends BaseService
 {
@@ -129,7 +130,8 @@ class PaymentService extends BaseService
                 creditable: $payment,
                 userId: $payment->user_id,
                 creditCoinId: 2,
-                creditValue: $data['credit_amount']
+                creditValue: $data['credit_amount'],
+                reasonId: CreditReasonEnum::PAYMENT->value
             );
             
             return $payment;
