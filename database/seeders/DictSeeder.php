@@ -58,6 +58,70 @@ class DictSeeder extends Seeder
                 'icon' => '',
                 'is_virtual' => true
             ],
+            [
+                'id' => 4,
+                'name' => 'Знание',
+                'short_name' => 'зн',
+                'code' => 'knowledge',
+                'icon' => '',
+                'is_virtual' => true
+            ],
+            [
+                'id' => 5,
+                'name' => 'Умение',
+                'short_name' => 'ум',
+                'code' => 'skill',
+                'icon' => '',
+                'is_virtual' => true
+            ],
+            [
+                'id' => 6,
+                'name' => 'Дисциплина',
+                'short_name' => 'дисц',
+                'code' => 'discipline',
+                'icon' => '',
+                'is_virtual' => true
+            ],
+            [
+                'id' => 7,
+                'name' => 'Креатив',
+                'short_name' => 'кр',
+                'code' => 'creative',
+                'icon' => '',
+                'is_virtual' => true
+            ],
+            [
+                'id' => 8,
+                'name' => 'Дружба',
+                'short_name' => 'др',
+                'code' => 'friendship',
+                'icon' => '',
+                'is_virtual' => true
+            ],
+            [
+                'id' => 9,
+                'name' => 'Урок',
+                'short_name' => 'ур',
+                'code' => 'class',
+                'icon' => '',
+                'is_virtual' => true
+            ],
+            [
+                'id' => 10,
+                'name' => 'Дом',
+                'short_name' => 'дом',
+                'code' => 'home',
+                'icon' => '',
+                'is_virtual' => true
+            ],
+            [
+                'id' => 11,
+                'name' => 'Экстра',
+                'short_name' => 'экс',
+                'code' => 'extra',
+                'icon' => '',
+                'is_virtual' => true
+            ],
         ];
 
         foreach ($coins as $coin) {

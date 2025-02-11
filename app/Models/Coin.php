@@ -10,7 +10,8 @@ class Coin extends Model
         'name',
         'code',
         'icon',
-        'is_virtual'
+        'is_virtual',
+        'short_name'
     ];
 
     public function credits()
