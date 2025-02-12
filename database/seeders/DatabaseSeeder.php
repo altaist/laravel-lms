@@ -27,7 +27,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         // Проверяем, нужно ли сидировать тестовые данные
-        if ($this->command->option('test')) {
+        if ($this->command->confirm('Хотите добавить тестовые данные?', false)) {
             $this->call(TestSeeder::class);
         }
     }
