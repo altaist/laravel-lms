@@ -3,29 +3,30 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Models\LoginToken;
+use App\Services\LoginLinkService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 
 class MagicLinkController extends Controller
 {
+    protected $loginLinkService;
+
+    public function __construct(LoginLinkService $loginLinkService)
+    {
+        $this->loginLinkService = $loginLinkService;
+    }
+
     public function login(string $token): RedirectResponse
     {
-        $loginToken = LoginToken::where('token', $token)->first();
+        $user = $this->loginLinkService->validateToken($token);
         
-        if (!$loginToken) {
+        if (!$user) {
             return redirect()->route('login')->withErrors([
                 'email' => 'Недействительная ссылка для входа.'
             ]);
         }
 
-        // Авторизуем пользователя
-        Auth::login($loginToken->user);
-
-        // Удаляем использованный токен
-        $loginToken->delete();
-
-        // Перенаправляем на домашнюю страницу в соответствии с ролью
-        return redirect()->route($loginToken->user->getHomeRoute());
+        Auth::login($user);
+        return redirect()->route($user->getHomeRoute());
     }
 }

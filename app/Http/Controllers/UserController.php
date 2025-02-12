@@ -11,16 +11,19 @@ use App\Models\LoginToken;
 use Illuminate\Http\JsonResponse;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use App\Services\LoginLinkService;
 
 class UserController extends Controller
 {
     use AuthorizesRequests;
 
     protected $userService;
+    protected $loginLinkService;
 
-    public function __construct(UserService $userService)
+    public function __construct(UserService $userService, LoginLinkService $loginLinkService)
     {
         $this->userService = $userService;
+        $this->loginLinkService = $loginLinkService;
     }
 
     public function show(User $user)
@@ -83,10 +86,9 @@ class UserController extends Controller
     public function generateLoginLink(User $user): JsonResponse
     {
         $this->authorize('generateLoginLinks', User::class);
-        // $this->authorize('generateLoginLinkFor', [$user]);
+        $this->authorize('generateLoginLinkFor', [$user]);
 
-        $token = $user->createLoginToken();
-        $link = route('login.token', $token);
+        $link = $this->loginLinkService->generateFor($user);
         
         return response()->json([
             'link' => $link
