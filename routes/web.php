@@ -29,7 +29,7 @@ Route::get('/dashboard', function () {
 
 Route::middleware('auth')->group(function () {
     Route::get('/lk/teacher', [TeacherController::class, 'lk'])->name('lk.teacher');
-    Route::get('/lk/teacher', [TeacherController::class, 'lk'])->name('lk.student');
+    Route::get('/lk/student', [StudentController::class, 'lk'])->name('lk.student');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

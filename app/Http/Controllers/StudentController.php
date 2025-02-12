@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Services\StudentService;
 use App\Services\TeamService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 use App\Models\User;
 use App\Services\UserService;
@@ -12,7 +13,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Requests\StudentRequest;
 
-class StudentController extends Controller
+class StudentController extends BaseController
 {
     protected $userService;
 
@@ -130,5 +131,20 @@ class StudentController extends Controller
             $teamsService->removeUserFromTeam($teamId, $studentId);
             return response()->json(['message' => 'Successfully removed from team']);
         }
+    }
+
+    public function lk()
+    {
+        $student = Auth::user()->load([
+            'teams.scheduleDays',
+            'activities',
+            'payments',
+            'balances',
+            'credits'
+        ]);
+
+        return $this->inertia('Lk/LkStudent', [
+            'student' => $student,
+        ]);
     }
 } 

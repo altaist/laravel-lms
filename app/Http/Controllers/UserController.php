@@ -86,7 +86,7 @@ class UserController extends Controller
     public function generateLoginLink(User $user): JsonResponse
     {
         $this->authorize('generateLoginLinks', User::class);
-        $this->authorize('generateLoginLinkFor', [$user]);
+        // $this->authorize('generateLoginLinkFor', [$user]);
 
         $link = $this->loginLinkService->generateFor($user);
         

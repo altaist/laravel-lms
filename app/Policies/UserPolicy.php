@@ -28,7 +28,16 @@ class UserPolicy
         }
 
         if ($user->isTeacher()) {
-            return $target->isStudent() && $target->parent_id === $user->id;
+            // Проверяем, является ли target студентом
+            if (!$target->isStudent()) {
+                return false;
+            }
+
+            // Проверяем, есть ли у учителя и студента общие команды
+            $teacherTeamIds = $user->teams->pluck('id')->toArray();
+            $studentTeamIds = $target->teams->pluck('id')->toArray();
+            
+            return !empty(array_intersect($teacherTeamIds, $studentTeamIds));
         }
 
         return false;

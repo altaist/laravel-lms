@@ -179,4 +179,12 @@ class User extends Authenticatable
     {
         return $this->role?->name;
     }
+
+    /**
+     * Получить все кредиты пользователя
+     */
+    public function credits(): HasMany
+    {
+        return $this->hasMany(Credit::class);
+    }
 }
