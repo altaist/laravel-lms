@@ -1,13 +1,6 @@
 <script setup>
 import AuthenticatedLayout from '@/_breeze/Layouts/AuthenticatedLayout.vue';
 import { Head } from '@inertiajs/vue3';
-
-const props = defineProps({
-  auth: {
-    type: Object,
-    required: true
-  }
-})
 </script>
 
 <template>
@@ -15,9 +8,7 @@ const props = defineProps({
 
     <AuthenticatedLayout>
         <template #header>
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                Ваша роль: {{ auth.user.role.name }} {{ auth.user.role_name }}
-            </h2>
+            <h2 class="font-semibold text-xl text-gray-800 leading-tight">Dashboard</h2>
         </template>
 
         <div class="py-12">

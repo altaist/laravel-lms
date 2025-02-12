@@ -10,11 +10,14 @@ use App\Services\PaymentService;
 use App\Services\ActivityService;
 use Illuminate\Support\Facades\Auth;
 use App\Services\UserService;
+use App\Models\LoginToken;
 
 class TeacherController extends BaseController
 {
     public function lk()
     {
+        $this->authorize('viewTeacherLk', User::class);
+
         $teamService = TeamService::make();
         $teams = $teamService->getAllTeams();
         $users = $teamService->getAllTeamUsers();
@@ -123,10 +126,17 @@ class TeacherController extends BaseController
         $studentService = StudentService::make();
         $teamService = TeamService::make();
         $paymentService = PaymentService::make();
+        
         $student = $studentService->getStudentWithTeams($studentId);
         $teams = $teamService->getAllTeams();
         $activities = $studentService->getActivities($studentId);
         $payments = $paymentService->getUserPayments($studentId);
+        
+        // Получаем текущий токен для входа
+        $loginToken = LoginToken::where('user_id', $studentId)->first();
+        
+        // Добавляем ссылку для входа в объект student
+        $student['loginLink'] = $loginToken ? route('login.token', $loginToken->token) : null;
         
         return $this->inertia('Lk/StudentDetails', [
             'student' => $student,

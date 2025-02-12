@@ -41,4 +41,12 @@ class UserPolicy
     {
         return $user->isAdmin();
     }
+
+    /**
+     * Определяет, может ли пользователь просматривать личный кабинет учителя
+     */
+    public function viewTeacherLk(User $user): bool
+    {
+        return $user->isTeacher();
+    }
 }

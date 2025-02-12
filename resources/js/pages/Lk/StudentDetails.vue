@@ -18,8 +18,10 @@
             <user-edit
               :user="student"
               :teams="teams"
+              :can="$page.props.can"
               @saved="onUserEdited"
               @cancelled="showEditDialog = false"
+              @linkGenerated="onLoginLinkGenerated"
             />
           </q-card-section>
         </q-card>
@@ -51,7 +53,10 @@
 
       <q-tab-panels v-model="tab" class="q-px-none">
         <q-tab-panel name="info" class="q-pa-none">
-          <student-info :student="student" />
+          <student-info 
+            ref="studentInfo"
+            :student="student" 
+          />
           <div class="q-my-md">
             <q-btn
               color="primary"
@@ -218,6 +223,7 @@ const showNewPaymentDialog = ref(false)
 const showCreditsDialog = ref(false)
 const showNewCreditDialog = ref(false)
 const userCredits = ref([])
+const studentInfo = ref(null)
 
 const getBalance = (student) => {
   const balance = student.balances?.find(b => b.coin_id === 2)
@@ -253,6 +259,12 @@ const loadCreditsAndShowDialog = async () => {
     showCreditsDialog.value = true
   } catch (error) {
     console.error('Ошибка при загрузке кредитов:', error)
+  }
+}
+
+const onLoginLinkGenerated = (link) => {
+  if (studentInfo.value) {
+    studentInfo.value.onLinkGenerated(link)
   }
 }
 

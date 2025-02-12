@@ -29,6 +29,7 @@ Route::get('/dashboard', function () {
 
 Route::middleware('auth')->group(function () {
     Route::get('/lk/teacher', [TeacherController::class, 'lk'])->name('lk.teacher');
+    Route::get('/lk/teacher', [TeacherController::class, 'lk'])->name('lk.student');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -79,9 +80,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/credits/manual', [CreditController::class, 'storeManual'])->name('credits.manual');
 
 
-    Route::get('/login/{token}', [MagicLinkController::class, 'login'])
-    ->name('login.token')
-    ->middleware('guest');  
+    Route::post('/users/{user}/login-link', [UserController::class, 'generateLoginLink'])
+    ->name('users.login-link');
 
 });
 

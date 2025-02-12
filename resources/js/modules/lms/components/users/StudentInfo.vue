@@ -75,11 +75,17 @@
           label="Дата рождения"
           :model-value="formatDate(student.person?.birthDate)"
         />
+
+        <!-- Ссылка для входа -->
+        <login-link-display :link="student.loginLink" />
       </div>
 </template>
 
 <script setup>
 import { date } from 'quasar'
+import { ref } from 'vue'
+import { useQuasar } from 'quasar'
+import LoginLinkDisplay from '@/modules/lms/components/common/LoginLinkDisplay.vue'
 
 const props = defineProps({
   student: {
@@ -87,6 +93,8 @@ const props = defineProps({
     required: true
   }
 })
+
+const $q = useQuasar()
 
 // Функция форматирования телефона
 const formatPhone = (phone) => {
@@ -105,4 +113,21 @@ const callPhone = (phone) => {
   if (!phone) return;
   window.location.href = `tel:+7${phone}`;
 }
-</script> 
+
+// Обработчик события генерации ссылки
+const onLinkGenerated = (link) => {
+  props.student.loginLink = link
+}
+
+defineExpose({
+  onLinkGenerated
+})
+</script>
+
+<style scoped>
+.ellipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+</style> 

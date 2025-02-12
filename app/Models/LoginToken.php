@@ -17,9 +17,18 @@ class LoginToken extends Model
 
     public static function generateFor(User $user): self
     {
-        return static::create([
+        // Удаляем все старые токены пользователя
+        self::where('user_id', $user->id)->delete();
+
+        // Генерируем уникальный токен
+        do {
+            $token = Str::random(8);
+        } while (self::where('token', $token)->exists());
+
+        // Создаем новый токен
+        return self::create([
             'user_id' => $user->id,
-            'token' => Str::random(64)
+            'token' => $token
         ]);
     }
 }

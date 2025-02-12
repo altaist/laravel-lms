@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Models\Balance;
 use App\Enums\UserRoleEnum;
+use Illuminate\Database\Eloquent\Builder;
 
 class User extends Authenticatable
 {
@@ -62,6 +63,15 @@ class User extends Authenticatable
             'settings' => 'object',
             'role_id' => UserRoleEnum::class,
         ];
+    }
+
+    protected $appends = ['role_name'];
+
+    protected static function booted()
+    {
+        static::addGlobalScope('withRole', function (Builder $builder) {
+            $builder->with('role');
+        });
     }
 
     public function activities()
@@ -156,12 +166,17 @@ class User extends Authenticatable
     }
 
     public function loginTokens(): HasMany
-{
-    return $this->hasMany(LoginToken::class);
-}
+    {
+        return $this->hasMany(LoginToken::class);
+    }
 
-public function createLoginToken(): string
-{
-    return LoginToken::generateFor($this)->token;
-}
+    public function createLoginToken(): string
+    {
+        return LoginToken::generateFor($this)->token;
+    }
+
+    public function getRoleNameAttribute(): ?string
+    {
+        return $this->role?->name;
+    }
 }

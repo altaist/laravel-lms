@@ -112,9 +112,26 @@
           </div>
         </div>
 
-        <div class="row justify-end q-mt-md">
-          <q-btn label="Отмена" flat v-close-popup class="q-mr-sm" />
-          <q-btn label="Сохранить" type="submit" color="primary" />
+        <!-- Кнопки -->
+        <div class="row justify-between q-mt-md">
+          <div class="col-12" v-if="true">
+            <!-- Отображение существующей ссылки -->
+            <login-link-display :link="user?.loginLink || generatedLink" />
+            
+            <!-- Кнопка генерации -->
+            <q-btn
+              class="q-mt-md"
+              label="Создать ссылку"
+              color="secondary"
+              icon="link"
+              @click="generateLoginLink"
+            />
+          </div>
+          
+          <div class="col-12 row justify-end q-mt-md">
+            <q-btn label="Отмена" flat v-close-popup class="q-mr-sm" />
+            <q-btn label="Сохранить" type="submit" color="primary" />
+          </div>
         </div>
       </q-form>
     </q-card-section>
@@ -124,6 +141,8 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useQuasar } from 'quasar'
+import { router } from '@inertiajs/vue3'
+import LoginLinkDisplay from '@/modules/lms/components/common/LoginLinkDisplay.vue'
 
 const props = defineProps({
   user: {
@@ -133,10 +152,16 @@ const props = defineProps({
   teams: {
     type: Array,
     required: true
+  },
+  can: {
+    type: Object,
+    default: () => ({
+      generateLoginLinks: false
+    })
   }
 })
 
-const emit = defineEmits(['saved'])
+const emit = defineEmits(['saved', 'linkGenerated'])
 const $q = useQuasar()
 
 const form = ref({
@@ -173,6 +198,8 @@ const teamOptions = computed(() => {
     value: team.id
   }))
 })
+
+const generatedLink = ref('')
 
 const initForm = () => {
   if (props.user) {
@@ -227,6 +254,30 @@ const onSubmit = async () => {
       position: 'top'
     })
     console.error('User save error:', error.response?.data)
+  }
+}
+
+const generateLoginLink = async () => {
+  try {
+    const response = await axios.post(route('users.login-link', props.user.id))
+    
+    $q.notify({
+      type: 'positive',
+      message: 'Ссылка для входа сгенерирована',
+      position: 'top'
+    })
+    
+    // Сохраняем ссылку для отображения в форме
+    generatedLink.value = response.data.link
+    
+    // Передаем ссылку родительскому компоненту
+    emit('linkGenerated', response.data.link)
+  } catch (error) {
+    $q.notify({
+      type: 'negative',
+      message: error.response?.data?.message || 'Ошибка при генерации ссылки',
+      position: 'top'
+    })
   }
 }
 
