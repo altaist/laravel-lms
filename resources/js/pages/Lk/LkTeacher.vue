@@ -131,6 +131,17 @@
         />
       </div>
     </div>
+
+    <!-- Ссылка Выйти -->
+    <div class="row justify-center q-mt-xl">
+      <q-btn
+        flat
+        color="grey-7"
+        label="Выйти"
+        icon="fa fa-sign-out-alt"
+        @click="logout"
+      />
+    </div>
   </page-layout-home>
 </template>
 
@@ -179,5 +190,9 @@ const onUserSaved = () => {
 // Функция для навигации к расписаниям всех групп
 const navigateToAllSchedules = () => {
   router.visit(route('teams.schedules.all.view'))
+}
+
+const logout = () => {
+  router.post(route('logout'))
 }
 </script> 

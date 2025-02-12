@@ -9,7 +9,9 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Models\Balance;
+use App\Enums\UserRoleEnum;
 
 class User extends Authenticatable
 {
@@ -27,6 +29,9 @@ class User extends Authenticatable
         'email',
         'password',
         'key',
+        'role_id',
+        'parent_id',
+        'status',
         'person',
         'statistic',
         'settings'
@@ -54,7 +59,8 @@ class User extends Authenticatable
             'password' => 'hashed',
             'person' => 'object',
             'statistic' => 'object',
-            '' => 'object',
+            'settings' => 'object',
+            'role_id' => UserRoleEnum::class,
         ];
     }
 
@@ -93,5 +99,59 @@ class User extends Authenticatable
     public function balances(): HasMany
     {
         return $this->hasMany(Balance::class);
+    }
+
+    /**
+     * Получить роль пользователя
+     */
+    public function role(): BelongsTo
+    {
+        return $this->belongsTo(Role::class);
+    }
+
+    /**
+     * Проверяет, является ли пользователь учителем
+     */
+    public function isTeacher(): bool
+    {
+        return $this->role_id === UserRoleEnum::TEACHER;
+    }
+
+    /**
+     * Проверяет, является ли пользователь администратором
+     */
+    public function isAdmin(): bool
+    {
+        return $this->role_id === UserRoleEnum::ADMIN;
+    }
+
+    /**
+     * Проверяет, является ли пользователь студентом
+     */
+    public function isStudent(): bool
+    {
+        return $this->role_id === UserRoleEnum::STUDENT;
+    }
+
+    /**
+     * Проверяет, является ли пользователь методистом
+     */
+    public function isMethodist(): bool
+    {
+        return $this->role_id === UserRoleEnum::METHODIST;
+    }
+
+    /**
+     * Получить домашний маршрут пользователя на основе его роли
+     */
+    public function getHomeRoute(): string
+    {
+        return match($this->role_id) {
+            UserRoleEnum::TEACHER => 'lk.teacher',
+            UserRoleEnum::STUDENT => 'lk.student',
+            UserRoleEnum::METHODIST => 'lk.methodist',
+            UserRoleEnum::ADMIN => 'admin.dashboard',
+            default => 'dashboard',
+        };
     }
 }

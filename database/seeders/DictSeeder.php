@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Role;
 use App\Models\Coin;
 use App\Models\Reason;
+use App\Enums\UserRoleEnum;
 use Illuminate\Database\Seeder;
 use App\Enums\CreditReasonEnum;
 use Illuminate\Support\Facades\DB;
@@ -19,17 +20,12 @@ class DictSeeder extends Seeder
         Reason::truncate();
 
         // Роли
-        $roles = [
-            ['id' => 1, 'name' => 'Администратор', 'slug' => 'admin'],
-            ['id' => 2, 'name' => 'Модератор', 'slug' => 'moderator'],
-            ['id' => 3, 'name' => 'Учитель', 'slug' => 'teacher'],
-            ['id' => 4, 'name' => 'Методист', 'slug' => 'methodist'],
-            ['id' => 10, 'name' => 'Ученик', 'slug' => 'student'],
-            ['id' => 100, 'name' => 'Пользователь', 'slug' => 'user'],
-        ];
-
-        foreach ($roles as $role) {
-            Role::create($role);
+        foreach (UserRoleEnum::cases() as $role) {
+            Role::create([
+                'id' => $role->value,
+                'name' => $role->label(),
+                'slug' => $role->slug(),
+            ]);
         }
 
         // Монеты
@@ -129,37 +125,12 @@ class DictSeeder extends Seeder
         }
 
         // Причины
-        DB::table('reasons')->insertOrIgnore([
-            [
-                'id' => CreditReasonEnum::LESSON->value,
-                'name' => 'Занятие',
-                'description' => 'Посещение занятия',
-            ],
-            [
-                'id' => CreditReasonEnum::ILLNESS->value,
-                'name' => 'Болезнь',
-                'description' => 'Отсутствие по болезни',
-            ],
-            [
-                'id' => CreditReasonEnum::LESSON_ACHIEVEMENT->value,
-                'name' => 'Достижение на уроке',
-                'description' => 'Достижения полученные во время занятия',
-            ],
-            [
-                'id' => CreditReasonEnum::ADDITIONAL_ACHIEVEMENT->value,
-                'name' => 'Дополнительное достижение',
-                'description' => 'Дополнительные достижения вне занятий',
-            ],
-            [
-                'id' => CreditReasonEnum::PAYMENT->value,
-                'name' => 'Платеж',
-                'description' => 'Начисление за платеж',
-            ],
-            [
-                'id' => CreditReasonEnum::MANUAL_ADJUSTMENT->value,
-                'name' => 'Ручная корректировка',
-                'description' => 'Ручная корректировка баланса',
-            ],
-        ]);
+        foreach (CreditReasonEnum::cases() as $reason) {
+            Reason::create([
+                'id' => $reason->value,
+                'name' => $reason->getName(),
+                'description' => $reason->getDescription(),
+            ]);
+        }
     }
 } 
