@@ -154,4 +154,14 @@ class User extends Authenticatable
             default => 'dashboard',
         };
     }
+
+    public function loginTokens(): HasMany
+{
+    return $this->hasMany(LoginToken::class);
+}
+
+public function createLoginToken(): string
+{
+    return LoginToken::generateFor($this)->token;
+}
 }

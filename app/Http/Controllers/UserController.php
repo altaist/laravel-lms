@@ -7,9 +7,15 @@ use App\Services\UserService;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Requests\StudentRequest;
+use App\Models\LoginToken;
+use Illuminate\Http\JsonResponse;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
-class StudentController extends Controller
+class UserController extends Controller
 {
+    use AuthorizesRequests;
+
     protected $userService;
 
     public function __construct(UserService $userService)
@@ -72,5 +78,27 @@ class StudentController extends Controller
 
         $user = $this->userService->createOrUpdate($data, $user);
         return response()->json($user->load('teams'));
+    }
+
+    public function generateLoginLink(User $user): JsonResponse
+    {
+        $this->authorize('generateLoginLinks', User::class);
+        $this->authorize('generateLoginLinkFor', [$user]);
+
+        $token = $user->createLoginToken();
+        $link = route('login.token', $token);
+        
+        return response()->json([
+            'link' => $link
+        ]);
+    }
+
+    public function viewLoginLinks(): JsonResponse
+    {
+        $this->authorize('viewLoginLinks', User::class);
+        
+        $links = LoginToken::with('user')->get();
+        
+        return response()->json($links);
     }
 } 
