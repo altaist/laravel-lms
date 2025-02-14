@@ -62,15 +62,8 @@ trait UserSeederTrait
             'role_id' => $data['role_id'],
             'status' => $data['status'] ?? 1,
             'key' => Str::random(32),
-            'person' => json_encode($data['person']),
-            'settings' => json_encode([
-                'theme' => 'light',
-                'notifications' => true
-            ]),
-            'statistics' => json_encode([
-                'last_login' => now(),
-                'login_count' => 0
-            ])
+            'person' => $data['person']
+
         ]);
     }
 } 

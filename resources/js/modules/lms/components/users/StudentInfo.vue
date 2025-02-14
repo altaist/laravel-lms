@@ -7,7 +7,7 @@
               outlined
               dense
               label="Фамилия"
-              :model-value="student.person?.lastName"
+              :model-value="student.person?.last_name"
             />
           </div>
           <div class="col-12 col-sm-6">
@@ -16,7 +16,7 @@
               outlined
               dense
               label="Имя"
-              :model-value="student.person?.firstName"
+              :model-value="student.person?.first_name"
             />
           </div>
         </div>
@@ -26,7 +26,7 @@
           outlined
           dense
           label="ФИО родителя"
-          :model-value="student.person?.parentFio"
+          :model-value="student.person?.parent_fio"
         />
 
         <q-input
@@ -34,7 +34,7 @@
           outlined
           dense
           label="Телефон родителя"
-          :model-value="formatPhone(student.person?.parentTel)"
+          :model-value="formatPhone(student.person?.parent_tel)"
         >
           <template v-slot:append>
             <q-btn
@@ -42,7 +42,7 @@
               round
               icon="phone"
               color="primary"
-              @click="callPhone(student.person?.parentTel)"
+              @click="callPhone(student.person?.parent_tel)"
             />
           </template>
         </q-input>
@@ -73,7 +73,7 @@
           outlined
           dense
           label="Дата рождения"
-          :model-value="formatDate(student.person?.birthDate)"
+          :model-value="formatDate(student.person?.birth_date)"
         />
 
         <!-- Ссылка для входа -->

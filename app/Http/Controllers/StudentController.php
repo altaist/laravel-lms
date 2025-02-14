@@ -138,7 +138,7 @@ class StudentController extends BaseController
         $student = Auth::user()->load([
             'teams.scheduleDays',
             'activities',
-            'payments',
+            'payments.user',
             'balances',
             'credits'
         ]);

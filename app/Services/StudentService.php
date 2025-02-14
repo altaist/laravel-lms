@@ -15,15 +15,6 @@ class StudentService
     {
         $student = User::with(['teams', 'activities', 'payments', 'balances'])->findOrFail($studentId);
         return $student;
-        return [
-            'id' => $student->id,
-            'name' => $student->name,
-            'email' => $student->email,
-            'teams' => $student->teams->map(fn($team) => [
-                'id' => $team->id,
-                'name' => $team->name
-            ])
-        ];
     }
 
     public function getPayments($studentId)

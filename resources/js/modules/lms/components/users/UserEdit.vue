@@ -22,7 +22,7 @@
           <!-- Фамилия и Имя в одной строке -->
           <div class="col-12 col-sm-6">
             <q-input
-              v-model="form.person.lastName"
+              v-model="form.person.last_name"
               label="Фамилия *"
               :rules="[val => !!val || 'Обязательное поле']"
               filled
@@ -35,7 +35,7 @@
 
           <div class="col-12 col-sm-6">
             <q-input
-              v-model="form.person.firstName"
+              v-model="form.person.first_name"
               label="Имя *"
               :rules="[val => !!val || 'Обязательное поле']"
               filled
@@ -49,7 +49,7 @@
           <!-- ФИО родителя -->
           <div class="col-12">
             <q-input
-              v-model="form.person.parentFio"
+              v-model="form.person.parent_fio"
               label="ФИО родителя *"
               :rules="[val => !!val || 'Обязательное поле']"
               filled
@@ -63,7 +63,7 @@
           <!-- Телефон родителя -->
           <div class="col-12">
             <q-input
-              v-model="form.person.parentTel"
+              v-model="form.person.parent_tel"
               label="Телефон родителя *"
               mask="(###) ###-##-##"
               :rules="[val => !!val || 'Обязательное поле']"
@@ -104,7 +104,7 @@
           <!-- Дата рождения -->
           <div class="col-12">
             <q-input
-              v-model="form.person.birthDate"
+              v-model="form.person.birth_date"
               type="date"
               label="Дата рождения"
               filled
@@ -125,12 +125,18 @@
               color="secondary"
               icon="link"
               @click="generateLoginLink"
+              :loading="loadingLink"
             />
           </div>
           
           <div class="col-12 row justify-end q-mt-md">
             <q-btn label="Отмена" flat v-close-popup class="q-mr-sm" />
-            <q-btn label="Сохранить" type="submit" color="primary" />
+            <q-btn 
+              label="Сохранить" 
+              type="submit" 
+              color="primary"
+              :loading="loading" 
+            />
           </div>
         </div>
       </q-form>
@@ -170,13 +176,13 @@ const form = ref({
   teamId: props.user?.teamId || null,
   user: props.user || null,
   person: {
-    lastName: props.user?.person?.lastName || '',
-    firstName: props.user?.person?.firstName || '',
-    birthDate: props.user?.person?.birthDate || '',
+    last_name: props.user?.person?.last_name || '',
+    first_name: props.user?.person?.first_name || '',
+    birth_date: props.user?.person?.birth_date || '',
     gender: props.user?.person?.gender || '',
     shift: props.user?.person?.shift || '',
-    parentFio: props.user?.person?.parentFio || '',
-    parentTel: props.user?.person?.parentTel || ''
+    parent_fio: props.user?.person?.parent_fio || '',
+    parent_tel: props.user?.person?.parent_tel || ''
   }
 })
 
@@ -200,6 +206,8 @@ const teamOptions = computed(() => {
 })
 
 const generatedLink = ref('')
+const loading = ref(false)
+const loadingLink = ref(false)
 
 const initForm = () => {
   if (props.user) {
@@ -209,13 +217,13 @@ const initForm = () => {
       teamId: props.user.teams?.[0]?.id || null,
       user_id: props.user?.id || null,
       person: {
-        lastName: props.user.person?.lastName || '',
-        firstName: props.user.person?.firstName || '',
-        birthDate: props.user.person?.birthDate || null,
+        last_name: props.user.person?.last_name || '',
+        first_name: props.user.person?.first_name || '',
+        birth_date: props.user.person?.birth_date || null,
         gender: props.user.person?.gender || '',
         shift: props.user.person?.shift || '',
-        parentFio: props.user.person?.parentFio || '',
-        parentTel: props.user.person?.parentTel || ''
+        parent_fio: props.user.person?.parent_fio || '',
+        parent_tel: props.user.person?.parent_tel || ''
       }
     }
   }
@@ -223,21 +231,14 @@ const initForm = () => {
 
 const onSubmit = async () => {
   try {
-    const url = props.user 
+    loading.value = true
+    const url = props.user
       ? `/users/${props.user.id}` 
       : '/users'
     
     const method = props.user ? 'put' : 'post'
     
-    await axios[method](url, form.value, {
-      headers: {
-        'X-XSRF-TOKEN': document.cookie
-          .split('; ')
-          .find(row => row.startsWith('XSRF-TOKEN='))
-          ?.split('=')[1],
-      },
-      withCredentials: true
-    })
+    await axios[method](url, form.value)
     
     $q.notify({
       type: 'positive',
@@ -253,12 +254,14 @@ const onSubmit = async () => {
       message: message,
       position: 'top'
     })
-    console.error('User save error:', error.response?.data)
+  } finally {
+    loading.value = false
   }
 }
 
 const generateLoginLink = async () => {
   try {
+    loadingLink.value = true
     const response = await axios.post(route('users.login-link', props.user.id))
     
     $q.notify({
@@ -268,7 +271,8 @@ const generateLoginLink = async () => {
     })
     
     // Сохраняем ссылку для отображения в форме
-    generatedLink.value = response.data.link
+    generatedLink.value = response.data.link;
+    props.user.loginLink = response.data.link;
     
     // Передаем ссылку родительскому компоненту
     emit('linkGenerated', response.data.link)
@@ -278,6 +282,8 @@ const generateLoginLink = async () => {
       message: error.response?.data?.message || 'Ошибка при генерации ссылки',
       position: 'top'
     })
+  } finally {
+    loadingLink.value = false
   }
 }
 

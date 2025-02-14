@@ -20,13 +20,13 @@ class StudentRequest extends FormRequest
                 ? 'nullable|email|max:255'
                 : 'nullable|email|max:255|unique:users,email',
             'teamId' => 'nullable|exists:teams,id',
-            'person.lastName' => 'required|string|max:255',
-            'person.firstName' => 'required|string|max:255',
-            'person.birthDate' => 'nullable|date',
+            'person.last_name' => 'required|string|max:255',
+            'person.first_name' => 'required|string|max:255',
+            'person.birth_date' => 'nullable|date',
             'person.gender' => 'nullable|in:male,female',
             'person.shift' => 'nullable|in:first,second',
-            'person.parentFio' => 'required|string|max:255',
-            'person.parentTel' => 'required|string|max:20',
+            'person.parent_fio' => 'required|string|max:255',
+            'person.parent_tel' => 'required|string|max:20',
         ];
     }
 
@@ -43,23 +43,23 @@ class StudentRequest extends FormRequest
             
             'teamId.exists' => 'Выбранная группа не существует',
             
-            'person.lastName.required' => 'Фамилия обязательна для заполнения',
-            'person.lastName.max' => 'Фамилия не должна превышать 255 символов',
+            'person.last_name.required' => 'Фамилия обязательна для заполнения',
+            'person.last_name.max' => 'Фамилия не должна превышать 255 символов',
             
-            'person.firstName.required' => 'Имя обязательно для заполнения',
-            'person.firstName.max' => 'Имя не должно превышать 255 символов',
+            'person.first_name.required' => 'Имя обязательно для заполнения',
+            'person.first_name.max' => 'Имя не должно превышать 255 символов',
             
-            'person.birthDate.date' => 'Некорректный формат даты рождения',
+            'person.birth_date.date' => 'Некорректный формат даты рождения',
             
             'person.gender.in' => 'Некорректное значение пола',
             
             'person.shift.in' => 'Некорректное значение смены',
             
-            'person.parentFio.required' => 'ФИО родителя обязательно для заполнения',
-            'person.parentFio.max' => 'ФИО родителя не должно превышать 255 символов',
+            'person.parent_fio.required' => 'ФИО родителя обязательно для заполнения',
+            'person.parent_fio.max' => 'ФИО родителя не должно превышать 255 символов',
             
-            'person.parentTel.required' => 'Телефон родителя обязателен для заполнения',
-            'person.parentTel.max' => 'Телефон родителя не должен превышать 20 символов',
+            'person.parent_tel.required' => 'Телефон родителя обязателен для заполнения',
+            'person.parent_tel.max' => 'Телефон родителя не должен превышать 20 символов',
         ];
     }
 
@@ -74,13 +74,13 @@ class StudentRequest extends FormRequest
             'name' => 'Имя пользователя',
             'email' => 'Email',
             'teamId' => 'Группа',
-            'person.lastName' => 'Фамилия',
-            'person.firstName' => 'Имя',
-            'person.birthDate' => 'Дата рождения',
+            'person.last_name' => 'Фамилия',
+            'person.first_name' => 'Имя',
+            'person.birth_date' => 'Дата рождения',
             'person.gender' => 'Пол',
             'person.shift' => 'Смена',
-            'person.parentFio' => 'ФИО родителя',
-            'person.parentTel' => 'Телефон родителя',
+            'person.parent_fio' => 'ФИО родителя',
+            'person.parent_tel' => 'Телефон родителя',
         ];
     }
 } 

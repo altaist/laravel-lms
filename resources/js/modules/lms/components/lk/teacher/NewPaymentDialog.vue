@@ -18,7 +18,7 @@
         />
 
         <div v-else class="text-subtitle1 q-mb-md">
-          Ученик: {{ props.user.person?.lastName }} {{ props.user.person?.firstName }}
+          Ученик: {{ props.user.person?.last_name }} {{ props.user.person?.firstName }}
         </div>
 
         <div class="row ">
@@ -112,7 +112,7 @@ const form = ref({
 
 if (props.user) {
   form.value.user = {
-    label: `${props.user.person?.lastName} ${props.user.person?.firstName}`,
+    label: `${props.user.person?.last_name} ${props.user.person?.firstName}`,
     value: props.user.id
   }
 }

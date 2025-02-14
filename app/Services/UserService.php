@@ -19,13 +19,13 @@ class UserService
                 'name' => $data['name'],
                 'email' => $data['email'],
                 'person' => [
-                    'lastName' => $data['person']['lastName'],
-                    'firstName' => $data['person']['firstName'],
-                    'birthDate' => $data['person']['birthDate'] ?? null,
+                    'last_name' => $data['person']['last_name'],
+                    'first_name' => $data['person']['first_name'],
+                    'birth_date' => $data['person']['birth_date'] ?? null,
                     'gender' => $data['person']['gender'] ?? null,
                     'shift' => $data['person']['shift'] ?? null,
-                    'parentFio' => $data['person']['parentFio'],
-                    'parentTel' => $data['person']['parentTel'],
+                    'parent_fio' => $data['person']['parent_fio'],
+                    'parent_tel' => $data['person']['parent_tel'],
                 ],
             ];
 

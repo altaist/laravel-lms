@@ -9,7 +9,7 @@
       <q-card-section>
         <div class="row items-center q-col-gutter-md">
           <div class="col-12 col-sm-8">
-            <div class="text-h5">{{ student.person?.firstName || student.name }} {{ student.person?.lastName || '' }}</div>
+            <div class="text-h5">{{ student.person?.firstName || student.name }} {{ student.person?.last_name || '' }}</div>
             <div class="text-subtitle2 q-mt-sm">{{ formatPhone(student.person?.parentTel) }}</div>
           </div>
           <div class="col-12 col-sm-4 text-right">

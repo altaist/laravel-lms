@@ -61,6 +61,7 @@ class UserController extends Controller
     public function update(StudentRequest $request, User $user)
     {
         $data = $request->validated();
+        dd($data);
         
         // Сохраняем старый email если новый не указан
         if (empty($data['email'])) {
