@@ -12,6 +12,7 @@ use App\Services\UserService;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Requests\StudentRequest;
+use App\Models\Coin;
 
 class StudentController extends BaseController
 {
@@ -110,11 +111,14 @@ class StudentController extends BaseController
         $teams = $studentService->getStudentWithTeams($studentId);
         $activities = $studentService->getActivities($studentId);
         $payments = $studentService->getPayments($studentId);
+        $coins = Coin::all();
+        dd($coins);
 
         return inertia('StudentDetails', [
             'teams' => $teams,
             'activities' => $activities,
             'payments' => $payments,
+            'coins' => $coins,
         ]);
     }
 
@@ -139,9 +143,14 @@ class StudentController extends BaseController
             'teams.scheduleDays',
             'activities',
             'payments.user',
-            'balances',
+            'balances.coin',
             'credits'
         ]);
+
+        // Добавляем коины в объект студента
+        $student = $student->toArray();
+        $student['coins'] = Coin::all();
+        dd($student);
 
         return $this->inertia('Lk/LkStudent', [
             'student' => $student,

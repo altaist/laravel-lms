@@ -13,6 +13,7 @@
             <q-space />
             <q-btn icon="close" flat round dense v-close-popup />
           </q-card-section>
+          
 
           <q-card-section class="q-pa-sm">
             <user-edit
@@ -31,10 +32,18 @@
         <q-card-section>
           <div class="row items-center">
             <div class="col">
-              <div class="text-h5">{{ student.person?.firstName || student.name }} {{ student.person?.lastName || '' }}</div>
-              <div class="text-caption">{{ student.tel }}</div>
+              <div class="text-h5">{{ student.person?.first_name || student.name }} {{ student.person?.last_name || '' }}</div>
+              <div class="text-caption">
+                <a 
+    :href="`tel:${student.person?.parent_tel}`" 
+    class="text-primary"
+    v-if="student.person?.parent_tel"
+  >
+    {{ formatPhone(student.person.parent_tel) }}
+  </a>
+</div>
             </div>
-            <div class="col-auto">
+            <div class="col-auto" @click="showBalancesDialog = true">
               <balance-chip
                 :balance="getBalance(student)"
               />
@@ -44,16 +53,45 @@
       </q-card>
       
       <q-tabs v-model="tab" class="q-mb-md">
-        <q-tab name="groups" label="Группы" />
+        <q-tab name="info" label="Инфо" />
         <q-tab name="activities" label="Занятия" />
         <q-tab name="payments" label="Платежи" />
-        <q-tab name="info" label="Инфо" />
-        <q-tab name="teams" label="Команды" />
       </q-tabs>
 
       <q-tab-panels v-model="tab" class="q-px-none">
         <q-tab-panel name="info" class="q-pa-none">
-          <student-info 
+          <div class="q-py-md">
+            <div class="text-h4 q-mb-md">Группы</div>
+            <q-list separator class="full-width">
+            <q-item
+              v-for="team in student.teams"
+              :key="team.id"
+              clickable
+              v-ripple
+              @click="() => router.visit(route('teacher.team.details', team.id))"
+            >
+              <q-item-section>
+                <q-item-label>{{ team.name }}</q-item-label>
+                <q-item-label caption>
+                  Количество учеников: {{ team.students_count || 0 }}
+                </q-item-label>
+              </q-item-section>
+              <q-item-section side>
+                <q-icon name="chevron_right" color="grey" />
+              </q-item-section>
+            </q-item>
+            <q-item v-if="!student.teams?.length">
+              <q-item-section>
+                <q-item-label class="text-grey">
+                  Студент не состоит ни в одной группе
+                </q-item-label>
+              </q-item-section>
+            </q-item>
+          </q-list>
+          </div>
+          <div class="q-py-md">
+            <div class="text-h4 q-mb-md">Информация</div>
+            <student-info 
             ref="studentInfo"
             :student="student" 
           />
@@ -65,6 +103,9 @@
               @click="showEditDialog = true"
             />
           </div>
+          </div>
+
+
         </q-tab-panel>
         <q-tab-panel name="groups" class="q-pa-none">
           <q-list separator class="full-width">
@@ -117,35 +158,28 @@
           </q-card>
         </q-tab-panel>
         <q-tab-panel name="activities" class="q-pa-sm">
-
-              <div class="text-h6">Занятия</div>
-              <q-list>
-                <q-item v-for="activity in activities" :key="activity.id" 
-                clickable v-ripple @click="() => router.visit(route('teacher.activity.details', activity.id))">
-                  <q-item-section>
-                    {{ activity.name }} - {{ activity.date }}
-                  </q-item-section>
-                </q-item>
-              </q-list>
+        <div v-if="activities.length">
+          <q-list>
+            <q-item v-for="activity in activities" :key="activity.id" 
+            clickable v-ripple @click="() => router.visit(route('teacher.activity.details', activity.id))">
+              <q-item-section>
+                {{ activity.name }} - {{ activity.date }}
+              </q-item-section>
+            </q-item>
+          </q-list>
+        </div>
+        <div class="text-center q-mt-md" v-else>
+          Студент не имеет занятий
+        </div>
 
         </q-tab-panel>
         <q-tab-panel name="payments" class="q-pa-sm">
           <div class="row q-col-gutter-sm">
             <div class="col-6">
               <q-btn
-                color="primary"
+                color="secondary"
                 icon="add"
-                label="Новый платеж"
-                stack
-                class="full-width"
-                @click="showNewPaymentDialog = true"
-              />
-            </div>
-            <div class="col-6">
-              <q-btn
-                color="primary"
-                icon="add_circle"
-                label="Корректировка начислений"
+                label="Корректировка"
                 stack
                 class="full-width"
                 @click="showNewCreditDialog = true"
@@ -161,9 +195,20 @@
                 @click="loadCreditsAndShowDialog"
               />
             </div>
+            <div class="col-6">
+              <q-btn
+                color="primary"
+                icon="add"
+                label="Новый платеж"
+                stack
+                class="full-width"
+                @click="showNewPaymentDialog = true"
+              />
+            </div>
+            
           </div>
           <div class="q-mt-lg">
-            <div class="text-h6 q-mb-md">Платежи</div>
+            <div class="text-h4 q-mb-md">Платежи</div>
             <payments-list :payments="payments" />
           </div>
           
@@ -184,7 +229,7 @@
           <q-dialog v-model="showNewCreditDialog">
             <new-credit-dialog
               :user="student"
-              :coins="coins"
+              :coins="student.coins"
               @saved="onCreditSaved"
             />
           </q-dialog>
@@ -193,6 +238,21 @@
 
       
     </div>
+
+    <!-- Добавить новый диалог перед закрывающим тегом page-layout -->
+    <q-dialog v-model="showBalancesDialog">
+      <q-card class="q-pa-md full-width" >
+        <q-card-section class="row items-center">
+          <div class="text-h6">Баланс</div>
+          <q-space />
+          <q-btn icon="close" flat round dense v-close-popup />
+        </q-card-section>
+
+        <q-card-section>
+          <user-balances-list :student="student" />
+        </q-card-section>
+      </q-card>
+    </q-dialog>
   </page-layout>
 </template>
 
@@ -208,6 +268,7 @@ import PaymentsList from '@/modules/lms/components/payments/PaymentsList.vue'
 import NewPaymentDialog from '@/modules/lms/components/lk/teacher/NewPaymentDialog.vue'
 import UserCreditsDialog from '@/modules/lms/components/credits/UserCreditsDialog.vue'
 import NewCreditDialog from '@/modules/lms/components/credits/NewCreditDialog.vue'
+import UserBalancesList from '@/modules/lms/components/users/UserBalancesList.vue'
 
 const props = defineProps({
   student: Object,
@@ -217,13 +278,14 @@ const props = defineProps({
   coins: Array,
 })
 
-const tab = ref('groups')
+const tab = ref('info')
 const showEditDialog = ref(false)
 const showNewPaymentDialog = ref(false)
 const showCreditsDialog = ref(false)
 const showNewCreditDialog = ref(false)
 const userCredits = ref([])
 const studentInfo = ref(null)
+const showBalancesDialog = ref(false)
 
 const getBalance = (student) => {
   const balance = student.balances?.find(b => b.coin_id === 2)
@@ -270,8 +332,15 @@ const onLoginLinkGenerated = (link) => {
 
 // Функция форматирования телефона
 const formatPhone = (phone) => {
-  if (!phone) return '';
-  return `+7 ${phone}`;
+  // Убираем все нецифровые символы
+  const cleaned = phone.replace(/\D/g, '')
+  
+  // Форматируем номер как +7 (XXX) XXX-XX-XX
+  if (cleaned.length === 11) {
+    return cleaned.replace(/(\d{1})(\d{3})(\d{3})(\d{2})(\d{2})/, '+$1 ($2) $3-$4-$5')
+  }
+  
+  return phone
 }
 
 // Функция форматирования даты

@@ -3,15 +3,29 @@
     <q-card-section class="row items-center">
       <div class="text-h6">История начислений</div>
       <q-space />
+
       <q-btn icon="close" flat round dense v-close-popup />
+    </q-card-section>
+    <q-card-section>
+      <q-select
+        v-model="selectedCoin"
+        :options="coinOptions"
+        label="Фильтр по валюте"
+        dense
+        options-dense
+        class="q-mr-md"
+        clearable
+        emit-value
+        map-options
+      />
     </q-card-section>
 
     <q-card-section class="q-pa-none">
       <q-list separator>
-        <q-item v-for="credit in credits" :key="credit.id">
+        <q-item v-for="credit in filteredCredits" :key="credit.id">
           <q-item-section>
             <q-item-label class="text-subtitle1">
-                {{ credit.reason?.name }}
+              {{ credit.reason?.name }}
             </q-item-label>
             <q-item-label caption>
               {{ credit.description }}
@@ -19,9 +33,8 @@
             <q-item-label caption>
             </q-item-label>
             <div class="text-caption">
-                {{ formatDate(credit.created_at) }}
+              {{ formatDate(credit.created_at) }}
             </div>
-
           </q-item-section>
           <q-item-section side>
             <div class="text-right">
@@ -34,12 +47,11 @@
               </q-chip>
             </div>
             <div class="text-caption">
-                {{ credit.coin?.name || 'Без описания коина' }}
-              </div>
-
+              {{ credit.coin?.name || 'Без описания коина' }}
+            </div>
           </q-item-section>
         </q-item>
-        <q-item v-if="!credits?.length">
+        <q-item v-if="!filteredCredits?.length">
           <q-item-section>
             <q-item-label class="text-grey text-center">
               Нет начислений
@@ -52,6 +64,7 @@
 </template>
 
 <script setup>
+import { ref, computed } from 'vue';
 import { date } from 'quasar';
 
 const props = defineProps({
@@ -60,6 +73,30 @@ const props = defineProps({
     required: true,
     default: () => []
   }
+});
+
+const selectedCoin = ref(null);
+
+// Получаем уникальные коины из истории начислений
+const coinOptions = computed(() => {
+  const uniqueCoins = new Map();
+  
+  props.credits.forEach(credit => {
+    if (credit.coin && !uniqueCoins.has(credit.coin.id)) {
+      uniqueCoins.set(credit.coin.id, {
+        label: credit.coin.name,
+        value: credit.coin.id
+      });
+    }
+  });
+  
+  return Array.from(uniqueCoins.values());
+});
+
+// Фильтруем начисления по выбранному коину
+const filteredCredits = computed(() => {
+  if (!selectedCoin.value) return props.credits;
+  return props.credits.filter(credit => credit.coin?.id === selectedCoin.value);
 });
 
 const formatDate = (dateStr) => {

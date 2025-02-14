@@ -12,7 +12,7 @@
           <q-input
             v-model.number="form.amount"
             type="number"
-            label="Сумма"
+            label="Значение"
             :rules="[val => !!val || 'Обязательное поле']"
           />
 
@@ -28,7 +28,7 @@
           <q-input
             v-model="form.description"
             type="textarea"
-            label="Описание"
+            label="Комментарий"
           />
         </div>
 
@@ -61,6 +61,10 @@ const props = defineProps({
   user: {
     type: Object,
     required: true
+  },
+  coins: {
+    type: Array,
+    required: true
   }
 })
 
@@ -68,7 +72,7 @@ const emit = defineEmits(['saved'])
 const loading = ref(false)
 
 const coinsOptions = computed(() => {
-  return COINS.map(coin => ({
+  return props.coins.map(coin => ({
     label: coin.name,
     value: coin.id
   }))
@@ -76,7 +80,7 @@ const coinsOptions = computed(() => {
 
 const form = reactive({
   user_id: props.user.id,
-  amount: null,
+  amount: 1,
   coin_id: DEFAULT_COIN_ID,
   description: '',
   reason_id: 6 // MANUAL_ADJUSTMENT из CreditReasonEnum
