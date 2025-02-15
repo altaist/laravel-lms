@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\UserRoleEnum;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 
@@ -18,6 +19,7 @@ class UserService
             $fillData = [
                 'name' => $data['name'],
                 'email' => $data['email'],
+                'role_id' => $data['role_id'] ?? UserRoleEnum::STUDENT->value,
                 'person' => [
                     'last_name' => $data['person']['last_name'],
                     'first_name' => $data['person']['first_name'],
