@@ -21,6 +21,15 @@ use Illuminate\Support\Facades\Auth;
 
 class ImportUsersCommand extends Command
 {
+    private const SYSTEM_USER_ID = 1;
+    private const RELATED_TABLES = [
+        'team_user',
+        'credits',
+        'balances',
+        'payments',
+        'login_tokens'
+    ];
+
     protected $signature = 'app:import-users 
         {--sync : Удалить записи, которых нет в CSV}
         {--clear : Удалить всех пользователей (id>' . User::SYSTEM_USERS_MAX_ID . ') перед импортом}
@@ -29,7 +38,6 @@ class ImportUsersCommand extends Command
     protected $description = 'Импорт пользователей и команд из CSV файла';
 
     private ?int $studentRoleId = null;
-    private const SYSTEM_USER_ID = 1; // ID системного пользователя
 
     public function __construct(
         private UserService $userService,
@@ -43,143 +51,86 @@ class ImportUsersCommand extends Command
 
     public function handle(): void
     {
-        // Устанавливаем системного пользователя как автора
         Auth::loginUsingId(self::SYSTEM_USER_ID);
 
-        if ($this->option('clear')) {
-            if ($this->confirm('Вы уверены, что хотите удалить всех пользователей (id>' . User::SYSTEM_USERS_MAX_ID . ')?')) {
-                DB::beginTransaction();
-                try {
-                    // Получаем ID пользователей для удаления
-                    $userIds = User::where('id', '>', User::SYSTEM_USERS_MAX_ID)
-                        ->pluck('id')
-                        ->toArray();
-
-                    if (!empty($userIds)) {
-                        // Сначала обновляем author_id в credits на системного пользователя
-                        DB::table('credits')
-                            ->whereIn('user_id', $userIds)
-                            ->update(['author_id' => self::SYSTEM_USER_ID]);
-
-                        // Затем удаляем связанные данные
-                        DB::table('team_user')->whereIn('user_id', $userIds)->delete();
-                        DB::table('credits')->whereIn('user_id', $userIds)->delete();
-                        DB::table('balances')->whereIn('user_id', $userIds)->delete();
-                        DB::table('payments')->whereIn('user_id', $userIds)->delete();
-                        DB::table('login_tokens')->whereIn('user_id', $userIds)->delete();
-                        
-                        // Удаляем самих пользователей
-                        $deletedCount = User::whereIn('id', $userIds)->delete();
-                        
-                        DB::commit();
-                        $this->info("Удалено пользователей: {$deletedCount}");
-                    } else {
-                        $this->info("Нет пользователей для удаления");
-                        DB::commit();
-                    }
-                } catch (\Exception $e) {
-                    DB::rollBack();
-                    $this->error("Ошибка при удалении пользователей: " . $e->getMessage());
-                    return;
-                }
-            } else {
-                $this->info('Операция отменена');
-                return;
-            }
+        if ($this->option('clear') && !$this->clearUsers()) {
+            return;
         }
 
+        if (!$csvFile = $this->openCsvFile()) {
+            return;
+        }
+
+        $this->processImport($csvFile);
+    }
+
+    private function clearUsers(): bool
+    {
+        if (!$this->confirm('Вы уверены, что хотите удалить всех пользователей (id>' . User::SYSTEM_USERS_MAX_ID . ')?')) {
+            $this->info('Операция отменена');
+            return false;
+        }
+
+        return $this->deleteUsers(
+            User::where('id', '>', User::SYSTEM_USERS_MAX_ID)->pluck('id')->toArray()
+        );
+    }
+
+    private function openCsvFile()
+    {
         $filename = $this->option('file');
         $filepath = base_path("database/data/{$filename}");
         
         if (!file_exists($filepath)) {
             $this->error("Файл не найден: database/data/{$filename}");
-            return;
+            return false;
         }
         
         $csvFile = fopen($filepath, "r");
         if ($csvFile === false) {
             $this->error("Не удалось открыть файл: database/data/{$filename}");
-            return;
+            return false;
         }
-        
+
         // Пропускаем заголовок
         $headers = fgetcsv($csvFile);
         if ($headers === false) {
             $this->error("Файл пуст или имеет неверный формат");
             fclose($csvFile);
-            return;
+            return false;
         }
-        
+
+        return ['file' => $csvFile, 'headers' => $headers];
+    }
+
+    private function processImport(array $csvData): void
+    {
         $processedIds = [];
         $rowCount = 0;
         $errorCount = 0;
         
-        $this->info("Начало импорта из файла: {$filename}");
+        $this->info("Начало импорта из файла: {$this->option('file')}");
         
         DB::beginTransaction();
         try {
-            while (($row = fgetcsv($csvFile)) !== false) {
-                $data = array_combine($headers, $row);
+            while (($row = fgetcsv($csvData['file'])) !== false) {
+                $data = array_combine($csvData['headers'], $row);
                 
-                // Проверяем уникальность email
-                $email = !empty($data['email']) 
-                    ? $data['email'] 
-                    : Str::slug($data['name']) . '@example.fakeemail';
-                    
-                if (User::where('email', $email)
-                        ->where('id', '!=', $data['id'] ?? 0)
-                        ->exists()) {
-                    $this->warn("Пропуск строки: email {$email} уже существует");
+                if (!$this->isValidEmail($data)) {
                     $errorCount++;
                     continue;
                 }
                 
-                // Обрабатываем пользователя
                 $user = $this->processUser($data);
                 $processedIds[] = $user->id;
                 
-                // Обрабатываем команду
                 $this->processTeam($data, $user);
                 
                 $rowCount++;
             }
             
-            // Если включена синхронизация, удаляем записи, которых нет в CSV
             if ($this->option('sync')) {
-                DB::beginTransaction();
-                try {
-                    // Получаем ID пользователей для удаления
-                    $userIds = User::where('id', '>', User::SYSTEM_USERS_MAX_ID)
-                        ->whereNotIn('id', $processedIds)
-                        ->pluck('id')
-                        ->toArray();
-
-                    if (!empty($userIds)) {
-                        // Сначала обновляем author_id в credits на системного пользователя
-                        DB::table('credits')
-                            ->whereIn('user_id', $userIds)
-                            ->update(['author_id' => self::SYSTEM_USER_ID]);
-
-                        // Затем удаляем связанные данные
-                        DB::table('team_user')->whereIn('user_id', $userIds)->delete();
-                        DB::table('credits')->whereIn('user_id', $userIds)->delete();
-                        DB::table('balances')->whereIn('user_id', $userIds)->delete();
-                        DB::table('payments')->whereIn('user_id', $userIds)->delete();
-                        DB::table('login_tokens')->whereIn('user_id', $userIds)->delete();
-                        
-                        // Удаляем самих пользователей
-                        $deletedCount = User::whereIn('id', $userIds)->delete();
-                        
-                        DB::commit();
-                        $this->info("Удалено пользователей: {$deletedCount}");
-                    } else {
-                        $this->info("Нет пользователей для удаления");
-                        DB::commit();
-                    }
-                } catch (\Exception $e) {
-                    DB::rollBack();
-                    $this->error("Ошибка при синхронизации пользователей: " . $e->getMessage());
-                }
+                $this->syncUsers($processedIds);
             }
             
             DB::commit();
@@ -189,8 +140,67 @@ class ImportUsersCommand extends Command
             DB::rollBack();
             $this->error("Произошла ошибка при импорте: " . $e->getMessage());
         } finally {
-            fclose($csvFile);
+            fclose($csvData['file']);
         }
+    }
+
+    private function isValidEmail(array $data): bool
+    {
+        $email = !empty($data['email']) 
+            ? $data['email'] 
+            : Str::slug($data['name']) . '@example.fakeemail';
+            
+        if (User::where('email', $email)
+                ->where('id', '!=', $data['id'] ?? 0)
+                ->exists()) {
+            $this->warn("Пропуск строки: email {$email} уже существует");
+            return false;
+        }
+        
+        return true;
+    }
+
+    private function deleteUsers(array $userIds): bool
+    {
+        if (empty($userIds)) {
+            $this->info("Нет пользователей для удаления");
+            return true;
+        }
+
+        DB::beginTransaction();
+        try {
+            // Обновляем author_id в credits
+            DB::table('credits')
+                ->whereIn('user_id', $userIds)
+                ->update(['author_id' => self::SYSTEM_USER_ID]);
+
+            // Удаляем связанные данные
+            foreach (self::RELATED_TABLES as $table) {
+                DB::table($table)->whereIn('user_id', $userIds)->delete();
+            }
+            
+            // Удаляем пользователей
+            $deletedCount = User::whereIn('id', $userIds)->delete();
+            
+            DB::commit();
+            $this->info("Удалено пользователей: {$deletedCount}");
+            return true;
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            $this->error("Ошибка при удалении пользователей: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    private function syncUsers(array $processedIds): void
+    {
+        $userIds = User::where('id', '>', User::SYSTEM_USERS_MAX_ID)
+            ->whereNotIn('id', $processedIds)
+            ->pluck('id')
+            ->toArray();
+
+        $this->deleteUsers($userIds);
     }
 
     private function processUser(array $data): User
