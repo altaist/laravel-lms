@@ -41,6 +41,12 @@
 
     </div>
 
+    <div class="col-12">
+      <div class="text-caption text-grey">
+        Показано записей: {{ filteredStudents.length }}
+      </div>
+    </div>
+
   </div>
   <div class="q-mt-lg">
   <!-- Список учеников -->

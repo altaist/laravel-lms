@@ -28,9 +28,9 @@ const props = defineProps({
 })
 
 const getBalanceColor = (balance) => {
-  if (balance > 3) return 'grey'
-  if (balance >= 1) return 'secondary'
-  if (balance > 0) return 'orange'
+  if (balance > 3) return 'secondary'
+  if (balance >= 1) return 'orange'
+  if (balance > 0) return 'negative'
   return 'negative'
 }
 </script> 
