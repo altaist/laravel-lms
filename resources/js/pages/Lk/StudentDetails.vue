@@ -157,7 +157,7 @@
             </q-card-section>
           </q-card>
         </q-tab-panel>
-        <q-tab-panel name="activities" class="q-pa-sm">
+        <q-tab-panel name="activities" class="q-pa-none">
         <div v-if="activities.length">
           <q-list>
             <q-item v-for="activity in activities" :key="activity.id" 
@@ -173,13 +173,13 @@
         </div>
 
         </q-tab-panel>
-        <q-tab-panel name="payments" class="q-pa-sm">
+        <q-tab-panel name="payments" class="q-pa-none">
           <div class="row q-col-gutter-sm">
             <div class="col-6">
               <q-btn
                 color="secondary"
                 icon="add"
-                label="Корректировка"
+                label="Новая корректировка"
                 stack
                 class="full-width"
                 @click="showNewCreditDialog = true"

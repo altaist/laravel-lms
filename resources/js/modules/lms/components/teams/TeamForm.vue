@@ -79,7 +79,7 @@ const props = defineProps({
   },
   title: {
     type: String,
-    default: 'Редактировать команду'
+    default: 'Редактировать группу'
   }
 })
 

@@ -10,7 +10,7 @@
       <q-select
         v-model="selectedCoin"
         :options="coinOptions"
-        label="Фильтр по валюте"
+        label="Фильтр"
         dense
         options-dense
         class="q-mr-md"

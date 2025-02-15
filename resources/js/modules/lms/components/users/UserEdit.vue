@@ -1,7 +1,7 @@
 <template>
-  <q-card flat style="min-width: 350px">
+  <q-card flat class="full-width">
     <q-card-section>
-      <q-form @submit="onSubmit" class="q-gutter-md">
+      <q-form @submit="onSubmit">
         <!-- Скрытые поля -->
         <q-input v-if="false" v-model="form.email" type="hidden" />
         <q-input v-if="false" v-model="form.name" type="hidden" />

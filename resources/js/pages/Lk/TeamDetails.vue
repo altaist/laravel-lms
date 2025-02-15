@@ -28,15 +28,16 @@
       <q-tab-panel name="info" class="q-pa-none">
         <q-card flat>
           <q-card-section>
-            <div class="text-subtitle2">Тип: {{ team.type || 'Не указан' }}</div>
             
-            <div class="q-mt-md">
-              <div>Количество учеников: {{ users.length }}</div>
-              <div>Количество занятий: {{ activities.length }}</div>
+            <div class="q-mt-md q-pa-md bg-grey-2">
+              <div class="row q-col-gutter-md">
+                <div class="col-6">Учеников: {{ users.length }}</div>
+                <div class="col-6">Занятий: {{ activities.length }}</div>
+              </div>
             </div>
 
-            <div class="q-mt-md">
-              <div class="text-h6 q-mb-sm">Расписание занятий</div>
+            <div class="q-mt-lg">
+              <div class="text-h4 q-mb-sm">Расписание занятий</div>
               
               <!-- Компонент отображения расписания -->
               <schedule-list 
@@ -69,13 +70,13 @@
       </q-tab-panel>
 
       <!-- Таб Ученики -->
-      <q-tab-panel name="students" class="q-px-none">
+      <q-tab-panel name="students" class="q-px-none q-py-lg">
         <students-list
           :students="users"
           :teams="[]"
           hide-teams
         />
-        <div class="q-pa-md row q-gutter-sm justify-center">
+        <div class="q-mt-lg row q-gutter-sm justify-center">
           <q-btn
             color="primary"
             label="Добавить"
@@ -206,7 +207,7 @@
     <q-dialog v-model="showEditDialog">
       <team-form
         :team="team"
-        title="Редактировать команду"
+        title="Редактировать группу"
         @save="handleEditTeam"
         @cancel="showEditDialog = false"
       />

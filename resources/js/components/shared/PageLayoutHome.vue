@@ -68,7 +68,7 @@ const props = defineProps({
     },
     rightBtnIcon: {
         type: String,
-        default: 'fa-solid fa-user'
+        default: null
     },
     rightBtnRoute: {
         type: String,

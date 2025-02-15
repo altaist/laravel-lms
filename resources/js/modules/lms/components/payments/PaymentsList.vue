@@ -60,6 +60,14 @@
           </div>
         </div>
       </q-card-section>
+      <q-card-actions align="right">
+        <q-btn
+          class="q-mb-md q-mr-sm"
+          color="primary"
+          label="Открыть пользователя"
+          @click="openStudentDetails(selectedPayment.user.id)"
+        />
+      </q-card-actions>
     </q-card>
   </q-dialog>
 </template>
@@ -67,7 +75,7 @@
 <script setup>
 import { ref } from 'vue'
 import { date } from 'quasar'
-
+import { router } from '@inertiajs/vue3'
 const props = defineProps({
   payments: {
     type: Array,
@@ -90,4 +98,9 @@ const showPaymentDetails = (payment) => {
   selectedPayment.value = payment
   showDialog.value = true
 }
+
+const openStudentDetails = (userId) => {
+  router.visit(route('teacher.student.details', { studentId: userId }))
+}
+
 </script> 

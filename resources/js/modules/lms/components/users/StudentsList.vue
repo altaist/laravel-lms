@@ -1,19 +1,19 @@
 <template>
   <!-- Фильтры -->
-  <div v-if="showSearch && filteredStudents.length > 0" class="row q-gutter-md q-mb-md">
-    <q-input
-      dense
-      debounce="300"
-      v-model="filter"
-      placeholder="Поиск по имени"
-      class="col"
-    >
-      <template v-slot:append>
-        <q-icon name="fa fa-search" />
-      </template>
-    </q-input>
+  <div v-if="showSearch" class="row q-col-gutter-md q-mb-md">
 
-    <q-select
+    <div class="col-6 col-sm-6 col-md-4">
+      <q-select
+        dense
+        v-model="debtFilter"
+        :options="debtFilterOptions"
+        label="Статус баланса"
+      clearable
+      />
+    </div>
+
+    <div class="col-6 col-sm-6 col-md-4">
+      <q-select
       v-if="!hideTeamsFilter"
       dense
       v-model="selectedTeam"
@@ -24,9 +24,25 @@
       map-options
       label="Группа"
       clearable
-      class="col"
     />
+
+    </div>
+    <div class="col-12 col-sm-12 col-md-4">
+      <q-input
+      dense
+      debounce="300"
+      v-model="filter"
+      placeholder="Поиск по имени"
+    >
+      <template v-slot:append>
+        <q-icon name="fa fa-search" />
+      </template>
+    </q-input>
+
+    </div>
+
   </div>
+  <div class="q-mt-lg">
   <!-- Список учеников -->
   <q-list bordered separator v-if="filteredStudents.length > 0" >
     <q-item
@@ -53,6 +69,8 @@
   <!-- Сообщение, если учеников нет -->
   <div v-else class="text-center q-pa-md">
     Ученики не найдены
+  </div>
+
   </div>
 
   <!-- Диалог с деталями ученика -->
@@ -120,6 +138,13 @@ const selectedTeam = ref(null)
 const showDialog = ref(false)
 const selectedStudent = ref(null)
 
+const debtFilter = ref(null)
+const debtFilterOptions = [
+  { label: 'Долг', value: 'debt' },
+  { label: 'Скоро долг', value: 'soon_debt' },
+  { label: 'Без долгов', value: 'no_debt' }
+]
+
 const teamOptions = computed(() => {
   return props.teams.map(team => ({
     label: team.name,
@@ -130,6 +155,23 @@ const teamOptions = computed(() => {
 
 const filteredStudents = computed(() => {
   let filtered = props.students
+
+  // Фильтрация по долгам
+  if (debtFilter.value) {
+    filtered = filtered.filter(student => {
+      const balance = getBalance(student)
+      switch (debtFilter.value.value) {
+        case 'debt':
+          return balance <= 0
+        case 'soon_debt':
+          return balance > 0 && balance < 2
+        case 'no_debt':
+          return balance >= 2
+        default:
+          return true
+      }
+    })
+  }
 
   // Фильтрация по группе
   if (!props.hideTeams && selectedTeam.value) {
@@ -160,8 +202,6 @@ const handleStudentClick = (student) => {
 
 const openStudentDetails = () => {
   if (selectedStudent.value) {
-    const onRowClick = (evt, row) => {
-}
     router.visit(route('teacher.student.details', { studentId: selectedStudent.value.id }))
   }
 }
