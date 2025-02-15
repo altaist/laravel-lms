@@ -3,7 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-use App\Models\Role;
+use App\Enums\UserRoleEnum;
 use Illuminate\Database\Seeder;
 use Database\Seeders\Traits\UserSeederTrait;
 
@@ -14,7 +14,7 @@ class SystemUsersSeeder extends Seeder
     public function run(): void
     {
         // Очищаем системных пользователей
-        User::where('id', '<', 10)->delete();
+        User::where('id', '<', User::SYSTEM_USERS_MAX_ID)->delete();
 
         // Создаем администратора (id = 1)
         $adminName = $this->generateRandomName('male');
@@ -22,7 +22,7 @@ class SystemUsersSeeder extends Seeder
             'id' => 1,
             'name' => 'Администратор',
             'email' => 'admin@example.fakeemail',
-            'role_id' => Role::where('slug', 'admin')->first()->id,
+            'role_id' => UserRoleEnum::ADMIN->value,
             'status' => 1,
             'person' => [
                 'fio' => $adminName['full_name'],
@@ -39,7 +39,7 @@ class SystemUsersSeeder extends Seeder
             'id' => 2,
             'name' => 'Менеджер',
             'email' => 'manager@example.fakeemail',
-            'role_id' => Role::where('slug', 'moderator')->first()->id,
+            'role_id' => UserRoleEnum::MODERATOR->value,
             'status' => 1,
             'person' => [
                 'fio' => $managerName['full_name'],
@@ -56,7 +56,24 @@ class SystemUsersSeeder extends Seeder
             'id' => 3,
             'name' => 'Учитель',
             'email' => 'teacher@robot04.ru',
-            'role_id' => Role::where('slug', 'teacher')->first()->id,
+            'role_id' => UserRoleEnum::TEACHER->value,
+            'status' => 1,
+            'person' => [
+                'fio' => $teacherName['full_name'],
+                'parent_tel' => $this->generatePhone(),
+                'parent_fio' => $this->generateParentFio(),
+                'age' => 25,
+                'gender' => $teacherName['gender']
+            ]
+        ]);
+
+        // Создаем учителя (id = 100)
+        $teacherName = $this->generateRandomName('female');
+        $this->createUser([
+            'id' => User::SYSTEM_USERS_MAX_ID,
+            'name' => 'Учитель',
+            'email' => 'teacher100@robot04.ru',
+            'role_id' => UserRoleEnum::TEACHER->value,
             'status' => 1,
             'person' => [
                 'fio' => $teacherName['full_name'],

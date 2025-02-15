@@ -187,4 +187,10 @@ class User extends Authenticatable
     {
         return $this->hasMany(Credit::class);
     }
+
+    /**
+     * ID, с которого начинаются обычные пользователи
+     * Все ID меньше этого значения считаются системными пользователями
+     */
+    public const SYSTEM_USERS_MAX_ID = 100;
 }
