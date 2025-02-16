@@ -24,7 +24,7 @@ class StudentRequest extends FormRequest
             'person.first_name' => 'required|string|max:255',
             'person.birth_date' => 'nullable|date',
             'person.gender' => 'nullable|in:male,female',
-            'person.shift' => 'nullable|in:first,second',
+            'person.shift' => 'nullable|in:first,second,other',
             'person.parent_fio' => 'required|string|max:255',
             'person.parent_tel' => 'required|string|max:20',
         ];
