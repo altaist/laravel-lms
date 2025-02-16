@@ -24,6 +24,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             DictSeeder::class,          // Справочники (роли, монеты, причины)
             SystemUsersSeeder::class,    // Системные пользователи
+            SystemTeamsSeeder::class,    // Системные группы
         ]);
 
         // Проверяем, нужно ли сидировать тестовые данные

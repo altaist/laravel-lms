@@ -195,7 +195,8 @@ const genderOptions = [
 const shiftOptions = [
   { label: 'Не указано', value: '' },
   { label: 'Первая', value: 'first' },
-  { label: 'Вторая', value: 'second' }
+  { label: 'Вторая', value: 'second' },
+  { label: 'Другое', value: 'other' }
 ]
 
 const teamOptions = computed(() => {

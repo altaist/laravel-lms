@@ -26,6 +26,8 @@ class SystemUsersSeeder extends Seeder
             'status' => 1,
             'person' => [
                 'fio' => $adminName['full_name'],
+                'first_name' => 'Администратор',
+                'last_name' => 'Администратор',
                 'parent_tel' => $this->generatePhone(),
                 'parent_fio' => $this->generateParentFio(),
                 'age' => 30,
@@ -43,6 +45,8 @@ class SystemUsersSeeder extends Seeder
             'status' => 1,
             'person' => [
                 'fio' => $managerName['full_name'],
+                'first_name' => 'Менеджер',
+                'last_name' => 'Менеджер',
                 'parent_tel' => $this->generatePhone(),
                 'parent_fio' => $this->generateParentFio(),
                 'age' => 28,
@@ -60,6 +64,8 @@ class SystemUsersSeeder extends Seeder
             'status' => 1,
             'person' => [
                 'fio' => $teacherName['full_name'],
+                'first_name' => 'Учитель',
+                'last_name' => 'Учитель',
                 'parent_tel' => $this->generatePhone(),
                 'parent_fio' => $this->generateParentFio(),
                 'age' => 25,
@@ -77,6 +83,8 @@ class SystemUsersSeeder extends Seeder
             'status' => 1,
             'person' => [
                 'fio' => $teacherName['full_name'],
+                'first_name' => 'Учитель',
+                'last_name' => 'Учитель',
                 'parent_tel' => $this->generatePhone(),
                 'parent_fio' => $this->generateParentFio(),
                 'age' => 25,
