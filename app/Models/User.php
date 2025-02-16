@@ -136,7 +136,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Проверяет, является ли пользователь студентом
+     * Проверяет, является ли пользователь учеником
      */
     public function isStudent(): bool
     {

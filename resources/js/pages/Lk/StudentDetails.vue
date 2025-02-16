@@ -1,6 +1,6 @@
 <template>
   <page-layout
-    title="Студент"
+    title="Ученик"
     right-btn-icon="fa-solid fa-pen"
     @click:header:right="showEditDialog = true"
   >
@@ -83,7 +83,7 @@
             <q-item v-if="!student.teams?.length">
               <q-item-section>
                 <q-item-label class="text-grey">
-                  Студент не состоит ни в одной группе
+                  Ученик не состоит ни в одной группе
                 </q-item-label>
               </q-item-section>
             </q-item>
@@ -129,7 +129,7 @@
             <q-item v-if="!student.teams?.length">
               <q-item-section>
                 <q-item-label class="text-grey">
-                  Студент не состоит ни в одной группе
+                  Ученик не состоит ни в одной группе
                 </q-item-label>
               </q-item-section>
             </q-item>
@@ -169,7 +169,7 @@
           </q-list>
         </div>
         <div class="text-center q-mt-md" v-else>
-          Студент не имеет занятий
+          Ученик не имеет занятий
         </div>
 
         </q-tab-panel>

@@ -20,14 +20,14 @@ class StudentService
     public function getPayments($studentId)
     {
         $student = User::findOrFail($studentId);
-        // Предположим, что у студента есть связь с платежами
+        // Предположим, что у ученика есть связь с платежами
         return $student->payments; // Или любая другая логика получения платежей
     }
 
     public function getActivities($studentId)
     {
         $student = User::findOrFail($studentId);
-        // Предположим, что у студента есть связь с занятиями
+        // Предположим, что у ученика есть связь с занятиями
         return $student->activities; // Или любая другая логика получения занятий
     }
 } 

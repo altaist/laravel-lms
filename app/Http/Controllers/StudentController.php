@@ -147,7 +147,7 @@ class StudentController extends BaseController
             'credits'
         ]);
 
-        // Добавляем коины в объект студента
+        // Добавляем коины в объект ученика
         $student = $student->toArray();
         $student['coins'] = Coin::all();
         dd($student);

@@ -135,7 +135,7 @@ class TeacherController extends BaseController
         // Получаем текущий токен для входа
         $loginToken = LoginToken::where('user_id', $studentId)->first();
         
-        // Преобразуем студента в массив и добавляем необходимые данные
+        // Преобразуем ученика в массив и добавляем необходимые данные
         $student = $student->toArray();
         $student['loginLink'] = $loginToken ? route('login.token', $loginToken->token) : null;
         $student['coins'] = \App\Models\Coin::all();

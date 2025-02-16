@@ -23,7 +23,7 @@ const props = defineProps({
   }
 })
 
-// Получаем все коины из props студента
+// Получаем все коины из props ученика
 const coins = computed(() => props.student?.coins || [])
 
 // Функция для получения баланса по id коина

@@ -28,12 +28,12 @@ class UserPolicy
         }
 
         if ($user->isTeacher()) {
-            // Проверяем, является ли target студентом
+            // Проверяем, является ли target учеником
             if (!$target->isStudent()) {
                 return false;
             }
 
-            // Проверяем, есть ли у учителя и студента общие команды
+            // Проверяем, есть ли у учителя и ученика общие команды
             $teacherTeamIds = $user->teams->pluck('id')->toArray();
             $studentTeamIds = $target->teams->pluck('id')->toArray();
             

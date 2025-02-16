@@ -1,10 +1,10 @@
 <template>
   <page-layout
-    title="Студент"
+    title="Ученик"
     right-btn-icon="fa-solid fa-pen"
     @click:header:right="showEditDialog = true"
   >
-    <!-- Основная информация о студенте -->
+    <!-- Основная информация о ученике -->
     <q-card class="q-mb-md">
       <q-card-section>
         <div class="row items-center q-col-gutter-md">
@@ -21,7 +21,7 @@
       </q-card-section>
     </q-card>
 
-    <!-- Информация о студенте -->
+    <!-- Информация о ученике -->
     <q-card class="q-mb-md">
       <q-card-section>
         <div class="text-h6 q-mb-md">Информация</div>

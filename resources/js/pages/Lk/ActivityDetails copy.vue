@@ -173,7 +173,7 @@ const showAddAvailableStudentsDialog = ref(false)
 const showAddTeamStudentsDialog = ref(false)
 const showRemoveStudentDialog = ref(false)
 
-// Добавляем новые refs для хранения выбранных студентов
+// Добавляем новые refs для хранения выбранных учеников
 const selectedStudentsToAdd = ref([])
 const selectedStudentsToRemove = ref([])
 
@@ -183,7 +183,7 @@ const availableStudents = computed(() => {
   return props.availableUsers.filter(user => !attachedIds.has(user.id))
 })
 
-// Заменяем функцию добавления одного студента на добавление нескольких
+// Заменяем функцию добавления одного ученика на добавление нескольких
 const addStudentsToActivity = async (students) => {
   try {
     await axios.post(route('activities.add-students'), {
@@ -230,7 +230,7 @@ const confirmRemoveStudents = (students) => {
   }).onOk(() => removeStudentsFromActivity(students))
 }
 
-// Заменяем функцию удаления одного студента на удаление нескольких
+// Заменяем функцию удаления одного ученика на удаление нескольких
 const removeStudentsFromActivity = async (students) => {
   try {
     await axios.post(route('activities.remove-students'), {

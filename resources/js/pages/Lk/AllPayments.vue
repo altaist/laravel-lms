@@ -94,7 +94,7 @@ const dateFilterOptions = [
 ]
 const selectedDateFilter = ref(dateFilterOptions[0])
 
-// Фильтрация студентов по поисковому запросу
+// Фильтрация учеников по поисковому запросу
 const filteredStudents = computed(() => {
   if (!searchQuery.value) return props.students
   const query = searchQuery.value.toLowerCase()

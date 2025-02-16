@@ -93,7 +93,7 @@
           />
         </div>
 
-        <!-- Диалоги для работы со студентами -->
+        <!-- Диалоги для работы со учениками -->
         <q-dialog v-model="showAddStudentDialog">
           <q-card style="width: 700px; max-width: 80vw;">
             <q-card-section class="row items-center">

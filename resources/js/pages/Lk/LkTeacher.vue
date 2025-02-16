@@ -183,7 +183,7 @@ const props = defineProps({
 
 const onUserSaved = () => {
   showNewStudentDialog.value = false;
-  // Обновляем список студентов с сервера
+  // Обновляем список учеников с сервера
   router.reload({ only: ['students'] });
 }
 

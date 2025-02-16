@@ -139,7 +139,7 @@ class PaymentService extends BaseService
     }
 
     /**
-     * Получить все платежи конкретного студента
+     * Получить все платежи конкретного ученика
      */
     public function getUserPayments(int $userId): Collection
     {
