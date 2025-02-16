@@ -19,7 +19,7 @@ enum CoinEnum: int
     public function label(): string
     {
         return match($this) {
-            self::RUBLE => 'Рубль',
+            self::RUBLE => 'Оплата',
             self::LESSON => 'Занятие',
             self::MINECRAFT => 'Майнкрафтик',
             self::KNOWLEDGE => 'Знание',

@@ -1,5 +1,5 @@
 <template>
-  <q-card class="full-width" style="max-width: 900px">
+  <q-card class="full-width" >
     <q-card-section class="row items-center">
       <div class="text-h6">Новая оплата</div>
       <q-space />
@@ -37,6 +37,7 @@
 
         <q-select
           v-if="!props.user && !form.user"
+          v-model="selectedOption"
           :options="userOptions"
           label="Или выберите из списка"
           @update:model-value="selectUserFromList"
@@ -164,12 +165,16 @@ const filteredUsers = computed(() => {
 })
 
 const userOptions = computed(() => {
-  return props.users.map(user => ({
-    label: `${user.person?.last_name} ${user.person?.first_name}`,
-    value: user.id,
-    user: user
-  }))
+  return props.users
+    .map(user => ({
+      label: `${user.person?.first_name} ${user.person?.last_name}`,
+      value: user.id,
+      user: user
+    }))
+    .sort((a, b) => a.label.localeCompare(b.label))
 })
+
+const selectedOption = ref(null)
 
 const selectUser = (user) => {
   form.value.user = {
@@ -182,6 +187,7 @@ const selectUser = (user) => {
 const selectUserFromList = (option) => {
   if (option) {
     selectUser(option.user)
+    selectedOption.value = null
   }
 }
 

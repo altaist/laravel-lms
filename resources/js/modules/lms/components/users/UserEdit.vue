@@ -194,8 +194,8 @@ const genderOptions = [
 
 const shiftOptions = [
   { label: 'Не указано', value: '' },
-  { label: 'Первая', value: 'first' },
-  { label: 'Вторая', value: 'second' },
+  { label: 'Первая', value: '1' },
+  { label: 'Вторая', value: '2' },
   { label: 'Другое', value: 'other' }
 ]
 
