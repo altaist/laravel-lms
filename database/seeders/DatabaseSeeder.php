@@ -25,6 +25,7 @@ class DatabaseSeeder extends Seeder
             DictSeeder::class,          // Справочники (роли, монеты, причины)
             SystemUsersSeeder::class,    // Системные пользователи
             SystemTeamsSeeder::class,    // Системные группы
+            SocialSeeder::class,
         ]);
 
         // Проверяем, нужно ли сидировать тестовые данные

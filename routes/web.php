@@ -9,9 +9,13 @@ use App\Http\Controllers\ActivityController;
 use App\Http\Controllers\CreditController;
 use App\Http\Controllers\Auth\MagicLinkController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\TelegramBotController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Auth;
+use App\Models\User;
+use App\Models\SocialUser;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -82,6 +86,12 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/users/{user}/login-link', [UserController::class, 'generateLoginLink'])
     ->name('users.login-link');
+
+    Route::post('/telegram/{botToken}/webhook', [TelegramBotController::class, 'handleCommand']);
+    Route::get('/telegram/login/{social_user}', function (SocialUser $socialUser) {
+        Auth::login($socialUser->user);
+        return redirect()->route('dashboard');
+    })->name('telegram.login')->middleware('signed');
 
 });
 

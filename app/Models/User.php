@@ -201,4 +201,12 @@ class User extends Authenticatable
      * Все ID меньше этого значения считаются системными пользователями
      */
     public const SYSTEM_USERS_MAX_ID = 100;
+
+    /**
+     * Получить социальные аккаунты пользователя
+     */
+    public function socialUsers(): HasMany
+    {
+        return $this->hasMany(SocialUser::class);
+    }
 }
