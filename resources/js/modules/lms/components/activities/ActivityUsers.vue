@@ -12,7 +12,7 @@
           <!-- Список пользователей группы -->
           <q-item v-for="user in teamUsers" :key="user.id">
             <q-item-section>
-              <q-item-label>{{ user.name }}</q-item-label>
+              <q-item-label>{{ user.person.first_name }} {{ user.person.last_name }}</q-item-label>
               <q-item-label caption>{{ user.email }}</q-item-label>
             </q-item-section>
 
@@ -34,7 +34,7 @@
           <!-- Список доступных пользователей -->
           <q-item v-for="user in availableUsers" :key="user.id">
             <q-item-section>
-              <q-item-label>{{ user.name }}</q-item-label>
+              <q-item-label>{{ user.person.first_name }} {{ user.person.last_name }}</q-item-label>
               <q-item-label caption>{{ user.email }}</q-item-label>
             </q-item-section>
 

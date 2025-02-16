@@ -58,7 +58,7 @@
       @click="handleStudentClick(student)"
     >
       <q-item-section>
-        <q-item-label>{{ student.name }}</q-item-label>
+        <q-item-label>{{ student.person.first_name }} {{ student.person.last_name }}</q-item-label>
         <q-item-label v-if="!hideTeams" caption>
           {{ student.teams?.map(team => team.name).join(', ') || 'Нет групп' }}
         </q-item-label>

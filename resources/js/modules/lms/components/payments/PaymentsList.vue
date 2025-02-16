@@ -9,7 +9,7 @@
       @click="showPaymentDetails(payment)"
     >
       <q-item-section>
-        <q-item-label>{{ payment.user.name }}</q-item-label>
+        <q-item-label>{{ payment.user.person.first_name }} {{ payment.user.person.last_name }}</q-item-label>
         <q-item-label caption>
           {{ payment.amount }} ₽ - {{ payment.pay_from }}
         </q-item-label>
@@ -39,7 +39,7 @@
           <div class="row q-col-gutter-md">
             <div class="col-12 col-sm-6">
               <div class="text-subtitle2">Ученик</div>
-              <div>{{ selectedPayment.user.name }}</div>
+              <div>{{ selectedPayment.user.person.first_name }} {{ selectedPayment.user.person.last_name }}</div>
             </div>
             <div class="col-12 col-sm-6">
               <div class="text-subtitle2">Сумма</div>

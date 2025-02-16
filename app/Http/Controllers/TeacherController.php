@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\UserRoleEnum;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Services\TeamService;
@@ -117,7 +118,7 @@ class TeacherController extends BaseController
             'users' => $users,
             'activities' => $activities,
             'payments' => $payments,
-            'allStudents' => User::with('balances')->get() // Добавляем список всех учеников
+            'allStudents' => User::with('balances')->students()->get() // Добавляем список всех учеников
         ]);
     }
 

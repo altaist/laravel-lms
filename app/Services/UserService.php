@@ -15,6 +15,13 @@ class UserService
             if (!$user) {
                 $user = new User();
             }
+            
+            // Генерируем имя пользователя если не указано
+            if (empty($data['name'])) {
+                $lastName = $data['person']['lastName'] ?? '';
+                $firstName = $data['person']['firstName'] ?? '';
+                $data['name'] = trim($firstName . ' ' . $lastName);
+            }
 
             $fillData = [
                 'name' => $data['name'],
@@ -43,5 +50,12 @@ class UserService
             DB::rollBack();
             throw $e;
         }
+    }
+
+    public function getStudentsList()
+    {
+        return User::students()
+            ->with(['teams', 'balances'])
+            ->get();
     }
 } 

@@ -74,6 +74,14 @@ class User extends Authenticatable
         });
     }
 
+    /**
+     * Scope для фильтрации только студентов
+     */
+    public function scopeStudents(Builder $query): Builder
+    {
+        return $query->where('role_id', UserRoleEnum::STUDENT);
+    }
+
     public function activities()
     {
         return $this->belongsToMany(Activity::class)

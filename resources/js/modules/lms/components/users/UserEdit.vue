@@ -237,7 +237,7 @@ const onSubmit = async () => {
       : '/users'
     
     const method = props.user ? 'put' : 'post'
-    
+    form.value.name = `${form.value.person.first_name} ${form.value.person.last_name}`;
     await axios[method](url, form.value)
     
     $q.notify({
