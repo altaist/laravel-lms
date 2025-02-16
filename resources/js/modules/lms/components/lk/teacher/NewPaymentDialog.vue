@@ -8,17 +8,52 @@
 
     <q-card-section>
       <q-form @submit="onSubmit" class="q-gutter-md">
+        <q-input
+          v-if="!props.user && !form.user"
+          v-model="searchQuery"
+          label="Поиск ученика *"
+          :rules="[val => (!!val || !!form.user) || 'Обязательное поле']"
+          class="q-mb-md"
+          filled
+        >
+          <template v-slot:append>
+            <q-icon name="search" />
+          </template>
+        </q-input>
+
+        <q-list v-if="!props.user && !form.user && filteredUsers.length > 0" bordered class="q-mb-md">
+          <q-item
+            v-for="user in filteredUsers"
+            :key="user.id"
+            clickable
+            v-ripple
+            @click="selectUser(user)"
+          >
+            <q-item-section>
+              {{ user.person?.last_name }} {{ user.person?.first_name }}
+            </q-item-section>
+          </q-item>
+        </q-list>
+
         <q-select
-          v-if="!props.user"
-          v-model="form.user"
+          v-if="!props.user && !form.user"
           :options="userOptions"
-          label="Пользователь *"
-          :rules="[val => !!val || 'Обязательное поле']"
+          label="Или выберите из списка"
+          @update:model-value="selectUserFromList"
+          filled
           class="q-mb-md"
         />
 
-        <div v-else class="text-subtitle1 q-mb-md">
-          Ученик: {{ props.user.person?.last_name }} {{ props.user.person?.firstName }}
+        <div v-if="form.user" class="text-subtitle1 q-mb-md">
+          Выбранный ученик: {{ form.user.label }}
+          <q-btn
+            flat
+            round
+            dense
+            icon="close"
+            @click="clearSelectedUser"
+            class="q-ml-sm"
+          />
         </div>
 
         <div class="row ">
@@ -112,18 +147,48 @@ const form = ref({
 
 if (props.user) {
   form.value.user = {
-    label: `${props.user.person?.last_name} ${props.user.person?.firstName}`,
+    label: `${props.user.person?.last_name} ${props.user.person?.first_name}`,
     value: props.user.id
   }
 }
 
+const searchQuery = ref('')
+const filteredUsers = computed(() => {
+  if (!searchQuery.value) return []
+  const query = searchQuery.value.toLowerCase()
+  return props.users.filter(user => {
+    const lastName = user.person?.last_name?.toLowerCase() || ''
+    const firstName = user.person?.first_name?.toLowerCase() || ''
+    return lastName.includes(query) || firstName.includes(query)
+  }).slice(0, 5)
+})
+
 const userOptions = computed(() => {
-  if (props.user) return []
   return props.users.map(user => ({
-    label: `${user.name} ${user.surname || ''}`,
-    value: user.id
+    label: `${user.person?.last_name} ${user.person?.first_name}`,
+    value: user.id,
+    user: user
   }))
 })
+
+const selectUser = (user) => {
+  form.value.user = {
+    label: `${user.person?.last_name} ${user.person?.first_name}`,
+    value: user.id
+  }
+  searchQuery.value = ''
+}
+
+const selectUserFromList = (option) => {
+  if (option) {
+    selectUser(option.user)
+  }
+}
+
+const clearSelectedUser = () => {
+  form.value.user = null
+  searchQuery.value = ''
+}
 
 const onSubmit = async () => {
   try {
