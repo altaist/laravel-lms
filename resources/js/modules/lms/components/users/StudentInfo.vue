@@ -54,7 +54,7 @@
               outlined
               dense
               label="Пол"
-              :model-value="student.person?.gender === 'M' ? 'Мужской' : 'Женский'"
+              :model-value="student.person?.gender === 'male' ? 'Мужской' : 'Женский'"
             />
           </div>
           <div class="col-12 col-sm-6">
@@ -63,7 +63,7 @@
               outlined
               dense
               label="Смена"
-              :model-value="student.person?.shift"
+              :model-value="student.person?.shift || student.person?.shift_comment"
             />
           </div>
         </div>

@@ -224,8 +224,10 @@ class ImportUsersCommand extends Command
                 'first_name' => explode(' ', $data['person.fio'])[1] ?? '',
                 'parent_tel' => $data['person.parent_tel'],
                 'parent_fio' => $data['person.parent_fio'],
-                'gender' => $data['person.gender'],
-                'birth_date' => null
+                'birth_date' => null,
+                'gender' => $this->normalizeGender($data['person.gender'] ?? null),
+                'shift' => $this->processShift($data),
+                'shift_comment' => $this->getShiftComment($data),
             ],
             'settings' => [
                 'theme' => 'light',
@@ -414,5 +416,62 @@ class ImportUsersCommand extends Command
         );
 
         $this->info("Добавлено {$amount} " . CoinEnum::LESSON->shortName() . " для пользователя {$user->name}");
+    }
+
+        /**
+     * Нормализует значение пола
+     */
+    private function normalizeGender(?string $gender): ?string
+    {
+        if (empty($gender)) {
+            return null;
+        }
+
+        $gender = mb_strtolower(trim($gender));
+        
+        return match($gender) {
+            'м', 'm', 'муж', 'мужской', 'male' => 'male',
+            'ж', 'f', 'жен', 'женский', 'female' => 'female',
+            default => null
+        };
+    }
+
+    /**
+     * Обрабатывает значение смены
+     */
+    private function processShift(array $data): ?int
+    {
+        if (empty($data['person.shift'])) {
+            return null;
+        }
+
+        $shift = trim($data['person.shift']);
+
+        // Если значение числовое, возвращаем его
+        if (is_numeric($shift)) {
+            return (int)$shift;
+        }
+
+        // Если не числовое, возвращаем null
+        return null;
+    }
+
+    /**
+     * Получает комментарий к смене
+     */
+    private function getShiftComment(array $data): ?string
+    {
+        if (empty($data['person.shift'])) {
+            return null;
+        }
+
+        $shift = trim($data['person.shift']);
+
+        // Если значение не числовое, возвращаем его как комментарий
+        if (!is_numeric($shift)) {
+            return $shift;
+        }
+
+        return null;
     }
 } 
