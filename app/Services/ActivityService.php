@@ -2,12 +2,16 @@
 
 namespace App\Services;
 
+use App\Enums\CoinEnum;
 use App\Models\Activity;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 use App\Enums\CreditReasonEnum;
+use App\Models\Credit;
+use App\Enums\UserRoleEnum;
+use App\Models\Balance;
 
 class ActivityService extends BaseService
 {
@@ -138,7 +142,7 @@ class ActivityService extends BaseService
         $this->balanceService->updateCreditAndBalance(
             creditable: $activity,
             userId: $user->id,
-            creditCoinId: 2, // Фиксированный coin_id для кредитов активности
+            creditCoinId: CoinEnum::LESSON->value, // Фиксированный coin_id для кредитов активности
             creditValue: -abs($creditValue), // Гарантируем отрицательное значение
             reasonId: CreditReasonEnum::LESSON->value // Используем код причины "Занятие"
         );
@@ -150,12 +154,36 @@ class ActivityService extends BaseService
         try {
             $activity = $this->getActivityById($id);
             
-            // Отменяем списания кредитов
-            DB::table('credits')
-                ->where('creditable_type', Activity::class)
-                ->where('creditable_id', $activity->id)
-                ->delete();
-                
+            // Получаем все кредиты, связанные с этой активностью
+            $credits = Credit::where([
+                'creditable_type' => Activity::class,
+                'creditable_id' => $activity->id,
+                'reason_id' => CreditReasonEnum::LESSON->value // Только записи о списании
+            ])->get();
+
+
+            // Возвращаем кредиты студентам
+            foreach ($credits as $credit) {
+                // Создаем запись о возврате кредитов
+                Credit::create([
+                    'author_id' => $credit->author_id,
+                    'user_id' => $credit->user_id,
+                    'coin_id' => $credit->coin_id,
+                    'amount' => abs($credit->amount), // Положительное значение для возврата
+                    'creditable_type' => Activity::class,
+                    'creditable_id' => $activity->id,
+                    'reason_id' => CreditReasonEnum::LESSON_CANCELLED->value
+                ]);
+
+                // Обновляем баланс
+                Balance::where([
+                    'user_id' => $credit->user_id,
+                    'coin_id' => $credit->coin_id
+                ])->increment('amount', abs($credit->amount));
+            }
+
+            // dd($credits->toArray(), $credits2->toArray());
+
             // Сбрасываем статус и временные метки
             $activity->update([
                 'status' => Activity::STATUS_PENDING,

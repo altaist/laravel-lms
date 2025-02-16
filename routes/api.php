@@ -22,9 +22,4 @@ Route::middleware('auth')->group(function () {
     Route::get('/student/teams', [StudentController::class, 'getTeams']);
     Route::get('/student/payments', [StudentController::class, 'getPayments']);
     Route::get('/student/activities', [StudentController::class, 'getActivities']);
-    Route::apiResource('activities', ActivityController::class);
-    Route::post('activities/{id}/process', [ActivityController::class, 'processActivity']);
-    Route::get('activities/{id}/details', [ActivityController::class, 'getDetails']);
-    Route::get('teams/{teamId}/activities', [ActivityController::class, 'getTeamActivities']);
-    //Route::apiResource('students', StudentController::class)->except(['index', 'destroy']);
 });

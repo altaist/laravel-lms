@@ -102,36 +102,6 @@ class ActivityController extends Controller
     }
 
     /**
-     * Обработать активность
-     */
-    public function processActivity(Request $request, int $id): JsonResponse
-    {
-        $validated = $request->validate([
-            'deduct_credits' => 'required|boolean',
-            'user_id' => 'required|exists:users,id',
-            'credit_value' => 'required_if:deduct_credits,true|integer|min:1'
-        ]);
-
-        $activity = Activity::findOrFail($id);
-        $user = User::findOrFail($validated['user_id']);
-
-        if ($validated['deduct_credits']) {
-            $this->activityService->deductCreditsForActivity(
-                activity: $activity,
-                user: $user,
-                creditValue: $validated['credit_value']
-            );
-        }
-
-        // Здесь можно добавить дополнительную логику обработки активности
-        
-        return response()->json([
-            'message' => 'Activity processed successfully',
-            'activity' => $activity
-        ]);
-    }
-
-    /**
      * Получить детали активности
      */
     public function getDetails(int $id): JsonResponse
@@ -155,14 +125,67 @@ class ActivityController extends Controller
     public function start(int $id): JsonResponse
     {
         $activity = Activity::findOrFail($id);
+        
         $activity->update([
-            'started_at' => now()
+            'started_at' => now(),
+            'status' => Activity::STATUS_STARTED
         ]);
         
         return response()->json($activity);
     }
 
+
+
     /**
+     * Завершить активность
+     */
+    public function stop(int $id): JsonResponse
+    {
+        $activity = Activity::with(['team'])->findOrFail($id);
+        
+        // Проверяем, не завершена ли уже активность
+        if ($activity->status === Activity::STATUS_FINISHED) {
+            return response()->json([
+                'message' => 'Activity is already finished'
+            ], 422);
+        }
+        
+        // Списываем кредиты для всех студентов группы
+        foreach ($activity->team->students as $student) {
+            $this->activityService->deductCreditsForActivity(
+                activity: $activity,
+                user: $student,
+                creditValue: 1 // Списываем 1 кредит
+            );
+        }
+        
+        $activity->update([
+            'finished_at' => now(),
+            'status' => Activity::STATUS_FINISHED
+        ]);
+        
+        return response()->json([
+            'message' => 'Activity stopped successfully',
+            'activity' => $activity
+        ]);
+    }
+
+    /**
+     * Перезапустить активность
+     */
+    public function restart(int $id): JsonResponse
+    {
+
+            $activity = $this->activityService->restartActivity($id);
+            
+            return response()->json([
+                'message' => 'Activity restarted successfully',
+                'activity' => $activity
+            ]);
+
+    }
+
+        /**
      * Добавить ученика к активности
      */
     public function addStudent(Request $request): JsonResponse
@@ -178,72 +201,6 @@ class ActivityController extends Controller
         );
 
         return response()->json(['message' => 'Student added successfully']);
-    }
-
-    /**
-     * Завершить активность
-     */
-    public function stop(int $id): JsonResponse
-    {
-        $activity = Activity::with('users')->findOrFail($id);
-        
-        // Списываем кредиты для всех прикрепленных пользователей
-        foreach ($activity->users as $user) {
-            $this->activityService->deductCreditsForActivity(
-                activity: $activity,
-                user: $user,
-                creditValue: 1 // Списываем 1 кредит
-            );
-        }
-        
-        $activity->update([
-            'finished_at' => now()
-        ]);
-        
-        return response()->json([
-            'message' => 'Activity stopped successfully',
-            'activity' => $activity
-        ]);
-    }
-
-    /**
-     * Удалить ученика из активности
-     */
-    public function removeStudent(Request $request): JsonResponse
-    {
-        $validated = $request->validate([
-            'activityId' => 'required|exists:activities,id',
-            'studentId' => 'required|exists:users,id'
-        ]);
-
-        $this->activityService->removeUserFromActivity(
-            $validated['activityId'],
-            $validated['studentId']
-        );
-
-        return response()->json([
-            'message' => 'Student removed successfully'
-        ]);
-    }
-
-    /**
-     * Перезапустить активность
-     */
-    public function restart(int $id): JsonResponse
-    {
-        try {
-            $activity = $this->activityService->restartActivity($id);
-            
-            return response()->json([
-                'message' => 'Activity restarted successfully',
-                'activity' => $activity
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'message' => 'Error restarting activity',
-                'error' => $e->getMessage()
-            ], 500);
-        }
     }
 
     /**
@@ -263,6 +220,26 @@ class ActivityController extends Controller
         );
 
         return response()->json(['message' => 'Students added successfully']);
+    }
+
+        /**
+     * Удалить ученика из активности
+     */
+    public function removeStudent(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'activityId' => 'required|exists:activities,id',
+            'studentId' => 'required|exists:users,id'
+        ]);
+
+        $this->activityService->removeUserFromActivity(
+            $validated['activityId'],
+            $validated['studentId']
+        );
+
+        return response()->json([
+            'message' => 'Student removed successfully'
+        ]);
     }
 
     /**

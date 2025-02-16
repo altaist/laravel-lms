@@ -10,6 +10,7 @@ enum CreditReasonEnum: int
     case ADDITIONAL_ACHIEVEMENT = 4;
     case PAYMENT = 5;
     case MANUAL_ADJUSTMENT = 6;
+    case LESSON_CANCELLED = 7;
 
     public function getName(): string
     {
@@ -20,6 +21,7 @@ enum CreditReasonEnum: int
             self::ADDITIONAL_ACHIEVEMENT => 'Дополнительное достижение',
             self::PAYMENT => 'Платеж',
             self::MANUAL_ADJUSTMENT => 'Ручная корректировка',
+            self::LESSON_CANCELLED => 'Отмена занятия',
         };
     }
 
@@ -32,6 +34,7 @@ enum CreditReasonEnum: int
             self::ADDITIONAL_ACHIEVEMENT => 'Дополнительные достижения вне занятий',
             self::PAYMENT => 'Начисление за платеж',
             self::MANUAL_ADJUSTMENT => 'Ручная корректировка баланса',
+            self::LESSON_CANCELLED => 'Возврат кредитов за отмененное занятие',
         };
     }
 } 
