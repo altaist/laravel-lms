@@ -2,148 +2,178 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
-use App\Models\Bot;
-use App\Models\Social;
-use App\Models\SocialUser;
-use App\Services\LoginLinkService;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\URL;
+use App\Services\Social\RegistrationTelegramService;
 use Illuminate\Http\Request;
+use Telegram\Bot\Api as TelegramApi;
 
 class TelegramBotController extends Controller
 {
-    protected $loginLinkService;
+    protected $telegramService;
 
-    public function __construct(LoginLinkService $loginLinkService)
+    public function __construct(RegistrationTelegramService $telegramService)
     {
-        $this->loginLinkService = $loginLinkService;
+        $this->telegramService = $telegramService;
     }
 
-    public function handleCommand(Request $request, $botToken)
+    /**
+     * Обработка входящих сообщений через webhook
+     */
+    public function handleWebhook(Request $request, $botToken)
     {
-        $bot = Bot::where('token', $botToken)
-            ->whereHas('social', function ($query) {
-                $query->where('code', 'telegram');
-            })
-            ->firstOrFail();
-            
-        $telegram = new \Telegram\Bot\Api($bot->token);
-        
-        $update = $telegram->getWebhookUpdate();
-        $message = $update->getMessage();
-        $from = $message->getFrom();
-        $telegramUserId = $from->getId();
-        
-        // Проверяем, является ли это командой start с параметром
-        if ($message->getText() && preg_match('/^\/start\s+(.+)$/', $message->getText(), $matches)) {
-            $startToken = $matches[1];
-            $this->handleStartCommand($telegram, $bot, $telegramUserId, $message, $startToken);
-        } else {
-            $this->handleStartCommand($telegram, $bot, $telegramUserId, $message, null);
-        }
-    }
-
-    private function handleStartCommand($telegram, Bot $bot, $telegramUserId, $message, ?string $startToken)
-    {
-        $from = $message->getFrom();
-        $chat = $message->getChat();
-        
-        // Получаем фото профиля пользователя
-        $photoUrl = $this->getUserProfilePhoto($telegram, $telegramUserId, $bot->token);
-
-        // Формируем данные о пользователе
-        $userData = [
-            'telegram_id' => $telegramUserId,
-            'first_name' => $from->getFirstName(),
-            'last_name' => $from->getLastName(),
-            'username' => $from->getUsername(),
-            'language_code' => $from->getLanguageCode(),
-            'is_premium' => $from->getIsPremium() ?? false,
-            'chat' => [
-                'id' => $chat->getId(),
-                'type' => $chat->getType(),
-                'title' => $chat->getTitle(),
-                'username' => $chat->getUsername(),
-            ],
-            'photo_url' => $photoUrl,
-            'bot_id' => $bot->id,
-        ];
-
-        // Формируем имя пользователя
-        $name = trim($from->getFirstName() . ' ' . $from->getLastName());
-        if (empty($name)) {
-            $name = $from->getUsername() ?? "User{$telegramUserId}";
-        }
-
-        // Создаем или находим social_user
-        $socialUser = SocialUser::firstOrCreate(
-            [
-                'social_id' => $bot->social_id,
-                'social_user_id' => $telegramUserId,
-            ],
-            [
-                'name' => $name,
-                'img' => $photoUrl,
-                'json_data' => $userData
-            ]
-        );
-
-        // Если есть start токен и он валидный
-        if ($startToken && ($user = $this->loginLinkService->validateToken($startToken))) {
-            // Привязываем социального пользователя к найденному пользователю
-            $socialUser->update(['user_id' => $user->id]);
-            
-            $welcomeMessage = "Аккаунт успешно привязан к Telegram!\n";
-            $welcomeMessage .= "Теперь вы можете использовать бота для входа в систему.";
-        } else {
-            // Если пользователь еще не привязан, создаем нового
-            if (!$socialUser->user_id) {
-                $user = User::create([
-                    'name' => $socialUser->name,
-                    'email' => $telegramUserId . '@telegram.com',
-                    'password' => bcrypt(Str::random(16))
-                ]);
-                
-                $socialUser->update(['user_id' => $user->id]);
-            }
-
-            // Генерируем временную ссылку для входа
-            $loginUrl = URL::temporarySignedRoute(
-                'telegram.login',
-                now()->addMinutes(30),
-                ['social_user' => $socialUser->id]
-            );
-
-            $welcomeMessage = "Добро пожаловать, {$socialUser->name}!\n" . 
-                         ($from->getUsername() ? "@{$from->getUsername()}\n\n" : "\n") .
-                         "Используйте эту ссылку для входа:\n{$loginUrl}";
-        }
-
-        // Отправляем сообщение
-        $telegram->sendMessage([
-            'chat_id' => $chat->getId(),
-            'text' => $welcomeMessage,
-            'parse_mode' => 'HTML'
+        \Log::info('Webhook request:', [
+            'token' => $botToken,
+            'content' => $request->getContent()
         ]);
+
+        return $this->processUpdate($request, $botToken);
     }
 
-    private function getUserProfilePhoto($telegram, $userId, $botToken)
+    /**
+     * Обработка входящих сообщений через pull
+     */
+    public function handlePull(Request $request, $botToken)
     {
+        \Log::info('Pull request:', [
+            'token' => $botToken,
+            'content' => $request->getContent()
+        ]);
+
+        return $this->processUpdate($request, $botToken);
+    }
+
+    /**
+     * Общий метод обработки обновлений
+     */
+    protected function processUpdate(Request $request, $botToken)
+    {
+        $bot = $this->telegramService->getBot($botToken);
+        $telegram = new TelegramApi($bot->token);
+
         try {
-            $photos = $telegram->getUserProfilePhotos([
-                'user_id' => $userId,
-                'limit' => 1
-            ]);
+            // Получаем данные из запроса в зависимости от источника
+            $update = $this->parseUpdateData($request);
             
-            if ($photos->getTotalCount() > 0) {
-                $photo = $photos->getPhotos()[0][0];
-                $file = $telegram->getFile(['file_id' => $photo->getFileId()]);
-                return 'https://api.telegram.org/file/bot' . $botToken . '/' . $file->getFilePath();
+            if (!isset($update['message'])) {
+                return response()->json(['status' => 'error', 'message' => 'No message found']);
             }
+
+            $message = $update['message'];
+            $chatId = $message['chat']['id'] ?? null;
+            
+            if (!$chatId) {
+                return response()->json(['status' => 'error', 'message' => 'No chat ID found']);
+            }
+
+            // Обработка команд
+            if (isset($message['text']) && strpos($message['text'], '/') === 0) {
+                return $this->handleCommand($telegram, $bot, $message);
+            }
+
+            // Обработка обычных сообщений
+            return $this->handleMessage($telegram, $chatId);
         } catch (\Exception $e) {
-            // Логирование ошибки если нужно
+            \Log::error('Telegram processing error:', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json(['status' => 'error', 'message' => $e->getMessage()]);
         }
-        return null;
+    }
+
+    /**
+     * Парсинг данных обновления
+     */
+    protected function parseUpdateData(Request $request)
+    {
+        if ($request->getContent()) {
+            return json_decode($request->getContent(), true);
+        }
+        return $request->all();
+    }
+
+    /**
+     * Обработка команд
+     */
+    protected function handleCommand(TelegramApi $telegram, $bot, array $message)
+    {
+        $parts = explode(' ', $message['text']);
+        $command = str_replace('/', '', $parts[0]);
+        $params = array_slice($parts, 1);
+        $chatId = $message['chat']['id'];
+        $telegramUserId = $message['from']['id'] ?? null;
+
+        switch ($command) {
+            case 'start':
+                $startToken = $params[0] ?? null;
+                $this->telegramService->handleStartCommand($telegram, $bot, $telegramUserId, $message, $startToken);
+                break;
+
+            case 'help':
+                $helpText = "Доступные команды:\n"
+                    . "/start - Начать работу с ботом\n"
+                    . "/help - Показать это сообщение\n"
+                    . "/debug - Показать отладочную информацию\n"
+                    . "/profile - Показать ваш профиль";
+                
+                $telegram->sendMessage([
+                    'chat_id' => $chatId,
+                    'text' => $helpText
+                ]);
+                break;
+
+            case 'debug':
+                $debugInfo = $this->formatDebugInfo($message);
+                $telegram->sendMessage([
+                    'chat_id' => $chatId,
+                    'text' => $debugInfo,
+                    'parse_mode' => 'HTML'
+                ]);
+                break;
+
+            default:
+                $telegram->sendMessage([
+                    'chat_id' => $chatId,
+                    'text' => 'Неизвестная команда. Используйте /help для получения списка команд.'
+                ]);
+        }
+
+        return response()->json(['status' => 'success']);
+    }
+
+    /**
+     * Обработка обычных сообщений
+     */
+    protected function handleMessage(TelegramApi $telegram, $chatId)
+    {
+        $telegram->sendMessage([
+            'chat_id' => $chatId,
+            'text' => 'Используйте команды для взаимодействия с ботом. /help для получения списка команд.'
+        ]);
+
+        return response()->json(['status' => 'success']);
+    }
+
+    /**
+     * Форматирование отладочной информации
+     */
+    protected function formatDebugInfo(array $message): string
+    {
+        $debugInfo = "🔍 Debug Information:\n\n";
+        $debugInfo .= "Message ID: " . ($message['message_id'] ?? 'N/A') . "\n";
+        $debugInfo .= "From User:\n";
+        $debugInfo .= "- ID: " . ($message['from']['id'] ?? 'N/A') . "\n";
+        $debugInfo .= "- Username: @" . ($message['from']['username'] ?? 'N/A') . "\n";
+        $debugInfo .= "- First Name: " . ($message['from']['first_name'] ?? 'N/A') . "\n";
+        $debugInfo .= "- Last Name: " . ($message['from']['last_name'] ?? 'N/A') . "\n";
+        $debugInfo .= "\nChat:\n";
+        $debugInfo .= "- ID: " . ($message['chat']['id'] ?? 'N/A') . "\n";
+        $debugInfo .= "- Type: " . ($message['chat']['type'] ?? 'N/A') . "\n";
+        $debugInfo .= "\nDate: " . date('Y-m-d H:i:s', $message['date'] ?? time()) . "\n";
+        $debugInfo .= "Text: " . ($message['text'] ?? 'N/A') . "\n\n";
+        $debugInfo .= "Raw Data:\n";
+        $debugInfo .= json_encode($message, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+
+        return $debugInfo;
     }
 } 

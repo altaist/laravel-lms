@@ -10,6 +10,7 @@ use App\Http\Controllers\CreditController;
 use App\Http\Controllers\Auth\MagicLinkController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\TelegramBotController;
+use App\Http\Controllers\TelegramTestController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -87,12 +88,30 @@ Route::middleware('auth')->group(function () {
     Route::post('/users/{user}/login-link', [UserController::class, 'generateLoginLink'])
     ->name('users.login-link');
 
-    Route::post('/telegram/{botToken}/webhook', [TelegramBotController::class, 'handleCommand']);
-    Route::get('/telegram/login/{social_user}', function (SocialUser $socialUser) {
+
+});
+
+// Роуты для Telegram
+Route::prefix('telegram')->group(function () {
+    // Webhook маршрут
+    Route::post('{botToken}/webhook', [TelegramBotController::class, 'handleWebhook']);
+    
+    // Pull маршрут
+    Route::post('{botToken}/pull', [TelegramBotController::class, 'handlePull']);
+
+    Route::get('login/{social_user}', function (SocialUser $socialUser) {
         Auth::login($socialUser->user);
         return redirect()->route('dashboard');
     })->name('telegram.login')->middleware('signed');
 
+    
+    // Тестовые маршруты
+    Route::prefix('test')->group(function () {
+        Route::get('/', [TelegramTestController::class, 'testInterface']);
+        Route::get('/poll', [TelegramTestController::class, 'startPolling']);
+        Route::get('/single-poll', [TelegramTestController::class, 'singlePoll']);
+        Route::post('/restore-webhook', [TelegramTestController::class, 'restoreWebhook']);
+    });
 });
 
 require __DIR__.'/auth.php';

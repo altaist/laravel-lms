@@ -15,14 +15,14 @@ class SocialUser extends Model
         'social_id',
         'social_user_id',
         'name',
-        'email',
-        'phone',
         'img',
         'json_data'
     ];
 
     protected $casts = [
-        'json_data' => 'array'
+        'json_data' => 'array',
+        'social_id' => 'integer',
+        'user_id' => 'integer'
     ];
 
     /**
@@ -36,5 +36,21 @@ class SocialUser extends Model
     public function social(): BelongsTo
     {
         return $this->belongsTo(Social::class);
+    }
+
+    /**
+     * Получить email из json_data
+     */
+    public function getEmailAttribute(): ?string
+    {
+        return $this->json_data['email'] ?? null;
+    }
+
+    /**
+     * Получить телефон из json_data
+     */
+    public function getPhoneAttribute(): ?string
+    {
+        return $this->json_data['phone'] ?? null;
     }
 } 

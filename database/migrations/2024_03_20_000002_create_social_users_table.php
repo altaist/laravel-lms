@@ -11,18 +11,11 @@ return new class extends Migration
         Schema::create('social_users', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->nullable()->constrained()->nullOnDelete();
-            $table->string('social_id');
-            
-            $table->string('social_type')->after('user_id')->default('telegram');
-            $table->foreignId('telegram_bot_id')->nullable()->after('social_type')
-                ->constrained()->nullOnDelete();
-
+            $table->foreignId('social_id')->constrained()->cascadeOnDelete();
+            $table->string('social_user_id');
             $table->string('name');
-            $table->string('email')->nullable();
-            $table->string('phone')->nullable();
             $table->string('img')->nullable();
             $table->json('json_data')->nullable();
-
             $table->timestamps();
             $table->softDeletes();
         });
