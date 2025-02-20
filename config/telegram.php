@@ -42,4 +42,16 @@ return [
         'parse_mode' => 'HTML',
         'timeout' => 30,
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Telegram Bot Commands
+    |--------------------------------------------------------------------------
+    */
+    'commands' => [
+        \App\Telegram\Commands\StartCommand::class,
+        \App\Telegram\Commands\HelpCommand::class,
+        \App\Telegram\Commands\ScheduleCommand::class,
+        \App\Telegram\Commands\BalanceCommand::class,
+    ],
 ]; 

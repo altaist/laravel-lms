@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Services\Social\RegistrationTelegramService;
 use Illuminate\Http\Request;
 use Telegram\Bot\Api as TelegramApi;
+use App\Models\Bot;
+use App\Services\Social\TelegramCommandService;
 
 class TelegramBotController extends Controller
 {
@@ -18,14 +20,31 @@ class TelegramBotController extends Controller
     /**
      * Обработка входящих сообщений через webhook
      */
-    public function handleWebhook(Request $request, $botToken)
+    public function handleWebhook(string $botToken)
     {
-        \Log::info('Webhook request:', [
-            'token' => $botToken,
-            'content' => $request->getContent()
-        ]);
-
-        return $this->processUpdate($request, $botToken);
+        try {
+            $bot = Bot::where('token', $botToken)->firstOrFail();
+            $telegram = new TelegramApi($botToken);
+            
+            // Регистрируем команды
+            $commandService = new TelegramCommandService($telegram, $bot);
+            $commandService->registerCommands();
+            
+            // Обрабатываем входящее обновление
+            $update = $telegram->getWebhookUpdate();
+            
+            // Обработка команд
+            $telegram->commandsHandler(true);
+            
+            return response()->json(['status' => 'ok']);
+        } catch (\Exception $e) {
+            \Log::error('Telegram webhook error:', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 
     /**
