@@ -19,6 +19,8 @@ return new class extends Migration
             $table->json('person')->nullable();
             $table->json('settings')->nullable();
             $table->json('statistics')->nullable();
+            $table->string('card_number')->nullable();
+            $table->timestamp('card_delivered_at')->nullable();
         });
     }
 

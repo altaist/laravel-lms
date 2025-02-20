@@ -239,6 +239,12 @@ class ImportUsersCommand extends Command
             ]
         ];
 
+        // Добавляем номер карты если он есть в CSV
+        if (!empty($data['card_number'])) {
+            $userData['card_number'] = $data['card_number'];
+            $userData['card_delivered_at'] = '2025-01-01 00:00:00';
+        }
+
         // Ищем существующего пользователя если есть ID
         $user = !empty($data['id']) ? User::find($data['id']) : null;
 

@@ -35,7 +35,9 @@ class User extends Authenticatable
         'status',
         'person',
         'statistic',
-        'settings'
+        'settings',
+        'card_number',
+        'card_delivered_at'
     ];
 
     /**
@@ -62,6 +64,7 @@ class User extends Authenticatable
             'statistic' => 'object',
             'settings' => 'object',
             'role_id' => UserRoleEnum::class,
+            'card_delivered_at' => 'datetime'
         ];
     }
 

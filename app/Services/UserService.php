@@ -35,6 +35,12 @@ class UserService
                 $fillData['password'] = $data['password'];
             }
 
+            // Добавляем номер карты если он предоставлен
+            if (isset($data['card_number'])) {
+                $fillData['card_number'] = $data['card_number'];
+                $fillData['card_delivered_at'] = $data['card_delivered_at'] ?? '2025-01-01 00:00:00';
+            }
+
             $user->fill($fillData);
             $user->save();
 
