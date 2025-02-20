@@ -6,9 +6,9 @@
       <q-select
         dense
         v-model="debtFilter"
-        :options="debtFilterOptions"
-        label="Статус баланса"
-      clearable
+        :options="filterOptions"
+        label="Фильтр"
+        clearable
       />
     </div>
 
@@ -145,10 +145,11 @@ const showDialog = ref(false)
 const selectedStudent = ref(null)
 
 const debtFilter = ref(null)
-const debtFilterOptions = [
+const filterOptions = [
   { label: 'Долг', value: 'debt' },
   { label: 'Скоро долг', value: 'soon_debt' },
-  { label: 'Без долгов', value: 'no_debt' }
+  { label: 'Без долгов', value: 'no_debt' },
+  { label: 'Без карты', value: 'no_card' }
 ]
 
 const teamOptions = computed(() => {
@@ -162,7 +163,7 @@ const teamOptions = computed(() => {
 const filteredStudents = computed(() => {
   let filtered = props.students
 
-  // Фильтрация по долгам
+  // Фильтрация по долгам и карте
   if (debtFilter.value) {
     filtered = filtered.filter(student => {
       const balance = getBalance(student)
@@ -173,6 +174,8 @@ const filteredStudents = computed(() => {
           return balance > 0 && balance < 2
         case 'no_debt':
           return balance >= 2
+        case 'no_card':
+          return !student.card_number
         default:
           return true
       }

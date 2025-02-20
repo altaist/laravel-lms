@@ -76,6 +76,27 @@
           :model-value="formatDate(student.person?.birth_date)"
         />
 
+        <div class="row q-col-gutter-md">
+          <div class="col-12 col-sm-6">
+            <q-input
+              readonly
+              outlined
+              dense
+              label="Номер карты"
+              :model-value="student.card_number"
+            />
+          </div>
+          <div class="col-12 col-sm-6">
+            <q-input
+              readonly
+              outlined
+              dense
+              label="Статус карты"
+              :model-value="getCardStatus"
+            />
+          </div>
+        </div>
+
         <!-- Ссылка для входа -->
         <login-link-display :link="student.loginLink" />
       </div>
@@ -83,7 +104,7 @@
 
 <script setup>
 import { date } from 'quasar'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useQuasar } from 'quasar'
 import LoginLinkDisplay from '@/modules/lms/components/common/LoginLinkDisplay.vue'
 
@@ -118,6 +139,11 @@ const callPhone = (phone) => {
 const onLinkGenerated = (link) => {
   props.student.loginLink = link
 }
+
+const getCardStatus = computed(() => {
+  if (!props.student.card_number) return 'Не выдана'
+  return props.student.card_delivered_at ? 'Активна' : 'Деактивирована'
+})
 
 defineExpose({
   onLinkGenerated

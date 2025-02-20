@@ -28,6 +28,8 @@ class StudentRequest extends FormRequest
             'person.shift_comment' => 'nullable|string|max:255',
             'person.parent_fio' => 'required|string|max:255',
             'person.parent_tel' => 'required|string|max:20',
+            'card_number' => 'nullable|string|max:255',
+            'card_active' => 'nullable|boolean'
         ];
     }
 
@@ -61,6 +63,8 @@ class StudentRequest extends FormRequest
             
             'person.parent_tel.required' => 'Телефон родителя обязателен для заполнения',
             'person.parent_tel.max' => 'Телефон родителя не должен превышать 20 символов',
+            
+            'card_number.max' => 'Номер карты не должен превышать 255 символов',
         ];
     }
 
@@ -82,6 +86,8 @@ class StudentRequest extends FormRequest
             'person.shift' => 'Смена',
             'person.parent_fio' => 'ФИО родителя',
             'person.parent_tel' => 'Телефон родителя',
+            'card_number' => 'Номер карты',
+            'card_active' => 'Статус карты'
         ];
     }
 } 

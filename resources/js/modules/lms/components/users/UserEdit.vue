@@ -110,6 +110,26 @@
               filled
             />
           </div>
+
+          <!-- Карточка -->
+          <div class="col-12">
+            <div class="row q-col-gutter-md items-center">
+              <div class="col">
+                <q-input
+                  v-model="form.card_number"
+                  label="Номер карты"
+                  filled
+                />
+              </div>
+              <div class="col-auto">
+                <q-toggle
+                  v-model="form.card_active"
+                  label="Карта активна"
+                  :disable="!form.card_number"
+                />
+              </div>
+            </div>
+          </div>
         </div>
 
         <!-- Кнопки -->
@@ -145,7 +165,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useQuasar } from 'quasar'
 import { router } from '@inertiajs/vue3'
 import LoginLinkDisplay from '@/modules/lms/components/common/LoginLinkDisplay.vue'
@@ -171,19 +191,22 @@ const emit = defineEmits(['saved', 'linkGenerated'])
 const $q = useQuasar()
 
 const form = ref({
-  name: props.user?.name || '',
-  email: props.user?.email || '',
-  teamId: props.user?.teamId || null,
-  user: props.user || null,
+  email: '',
+  name: '',
+  teamId: null,
+  user_id: null,
   person: {
-    last_name: props.user?.person?.last_name || '',
-    first_name: props.user?.person?.first_name || '',
-    birth_date: props.user?.person?.birth_date || '',
-    gender: props.user?.person?.gender || '',
-    shift: props.user?.person?.shift || '',
-    parent_fio: props.user?.person?.parent_fio || '',
-    parent_tel: props.user?.person?.parent_tel || ''
-  }
+    last_name: '',
+    first_name: '',
+    birth_date: null,
+    gender: '',
+    shift: '',
+    shift_comment: '',
+    parent_fio: '',
+    parent_tel: ''
+  },
+  card_number: '',
+  card_active: !!props.user?.card_delivered_at
 })
 
 const genderOptions = [
@@ -223,9 +246,12 @@ const initForm = () => {
         birth_date: props.user.person?.birth_date || null,
         gender: props.user.person?.gender || '',
         shift: props.user.person?.shift || '',
+        shift_comment: props.user.person?.shift_comment || '',
         parent_fio: props.user.person?.parent_fio || '',
         parent_tel: props.user.person?.parent_tel || ''
-      }
+      },
+      card_number: props.user.card_number || '',
+      card_active: !!props.user.card_delivered_at
     }
   }
 }
@@ -238,8 +264,14 @@ const onSubmit = async () => {
       : '/users'
     
     const method = props.user ? 'put' : 'post'
-    form.value.name = `${form.value.person.first_name} ${form.value.person.last_name}`;
-    await axios[method](url, form.value)
+    
+    // Убедимся что все поля формы передаются
+    const formData = {
+      ...form.value,
+      name: `${form.value.person.first_name} ${form.value.person.last_name}`
+    }
+    
+    await axios[method](url, formData)
     
     $q.notify({
       type: 'positive',
@@ -288,7 +320,15 @@ const generateLoginLink = async () => {
   }
 }
 
+// Следим за изменением номера карты
+watch(() => form.value.card_number, (newValue) => {
+  if (!newValue) {
+    form.value.card_active = false
+  }
+})
+
 onMounted(() => {
   initForm()
 })
+
 </script> 
