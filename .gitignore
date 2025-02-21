@@ -24,3 +24,6 @@ yarn-error.log
 .editorconfig
 .cursor/rules/lms.mdc
 import.csv
+database/data/import.xlsx
+database/data/payments.csv
+database/data/import.csv
