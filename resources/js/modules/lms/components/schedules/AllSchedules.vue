@@ -1,5 +1,5 @@
 <template>
-  <div class="all-schedules">
+  <div class="all-schedules q-pa-none">
     <div class="q-mb-md">
       <q-select
         v-model="currentViewMode"
@@ -13,7 +13,7 @@
 
     <!-- Режим отображения по группам -->
     <div v-if="currentViewMode === 'group'">
-      <q-list bordered separator>
+      <q-list separator>
         <q-item v-for="team in teams" :key="team.id">
           <q-item-section>
             <q-item-label class="text-weight-bold">{{ team.name }}</q-item-label>
@@ -35,7 +35,7 @@
 
     <!-- Режим отображения по дням недели -->
     <div v-else-if="currentViewMode === 'day'">
-      <q-list bordered separator>
+      <q-list separator>
         <div v-for="(groups, day) in schedulesByDay" :key="day">
           <q-item-label class="text-h6">{{ daysMap[day] }}</q-item-label>
           <q-item v-for="group in sortedGroupsByTime(groups)" :key="group.id" class="q-ml-md">
@@ -174,7 +174,6 @@ onMounted(() => {
 
 <style scoped>
 .all-schedules {
-  max-width: 800px;
   margin: 0 auto;
 }
 .text-h6 {

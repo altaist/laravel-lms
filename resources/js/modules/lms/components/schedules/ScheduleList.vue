@@ -1,5 +1,5 @@
 <template>
-  <div class="schedule-list">
+  <div class="full-width">
     <q-list bordered separator>
       <q-item v-for="day in formattedSchedule" :key="day.dayCode">
         <q-item-section>
@@ -88,9 +88,3 @@ const formattedSchedule = computed(() => {
     .sort((a, b) => a.dayCode - b.dayCode) // Сортируем по дням недели
 })
 </script>
-
-<style scoped>
-.schedule-list {
-  max-width: 400px;
-}
-</style> 

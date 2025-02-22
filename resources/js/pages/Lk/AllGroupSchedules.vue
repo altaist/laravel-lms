@@ -1,6 +1,6 @@
 <template>
     <page-layout title="Расписание">
-        <div class="all-group-schedules">
+        <div class="q-pa-none q-py-md">
           <all-schedules :initial-view-mode="viewMode" />
         </div>
     </page-layout>
@@ -12,9 +12,3 @@ import AllSchedules from '@/modules/lms/components/schedules/AllSchedules.vue'
 
 const viewMode = ref('group') // Можно изменить на 'day' по умолчанию, если требуется
 </script>
-
-<style scoped>
-.all-group-schedules {
-  padding: 20px;
-}
-</style> 

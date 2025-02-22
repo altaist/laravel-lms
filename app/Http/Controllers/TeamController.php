@@ -110,4 +110,11 @@ class TeamController extends Controller
             ], 500);
         }
     }
+
+    public function getSchedule($id)
+    {
+        $team = Team::findOrFail($id);
+        $scheduleDays = $team->schedule->days;
+        return response()->json($scheduleDays);
+    }
 } 

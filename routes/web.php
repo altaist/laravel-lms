@@ -83,6 +83,12 @@ Route::middleware('auth')->group(function () {
     Route::post('/users/{user}/login-link', [UserController::class, 'generateLoginLink'])
     ->name('users.login-link');
 
+    Route::get('/activities/all', [ActivityController::class, 'allActivities'])
+        ->name('activities.all');
+
+    Route::get('/teams/{id}/schedule', [TeamController::class, 'getSchedule'])
+        ->name('teams.schedule');
+
 });
 
 require __DIR__.'/auth.php';

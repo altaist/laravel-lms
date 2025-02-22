@@ -19,11 +19,10 @@
             />
           </div>
 
-          <!-- Фамилия и Имя в одной строке -->
           <div class="col-12 col-sm-6">
             <q-input
-              v-model="form.person.last_name"
-              label="Фамилия *"
+              v-model="form.person.first_name"
+              label="Имя *"
               :rules="[val => !!val || 'Обязательное поле']"
               filled
             >
@@ -33,10 +32,11 @@
             </q-input>
           </div>
 
+          <!-- Фамилия и Имя в одной строке -->
           <div class="col-12 col-sm-6">
             <q-input
-              v-model="form.person.first_name"
-              label="Имя *"
+              v-model="form.person.last_name"
+              label="Фамилия *"
               :rules="[val => !!val || 'Обязательное поле']"
               filled
             >
@@ -112,7 +112,7 @@
           </div>
 
           <!-- Карточка -->
-          <div class="col-12">
+          <div class="col-12" v-if="user">
             <div class="row q-col-gutter-md items-center">
               <div class="col">
                 <q-input
@@ -134,7 +134,17 @@
 
         <!-- Кнопки -->
         <div class="row justify-between q-mt-md">
-          <div class="col-12" v-if="true">
+          <!-- Кнопка автозаполнения -->
+          <div class="col-12 q-mb-md">
+            <q-btn
+              label="Автозаполнение"
+              color="grey"
+              icon="auto_fix_high"
+              @click="autoFill"
+            />
+          </div>
+
+          <div class="col-12" v-if="user">
             <!-- Отображение существующей ссылки -->
             <login-link-display :link="user?.loginLink || generatedLink" />
             
@@ -326,6 +336,14 @@ watch(() => form.value.card_number, (newValue) => {
     form.value.card_active = false
   }
 })
+
+// Обновляем функцию автозаполнения
+const autoFill = () => {
+  form.value.person.last_name = '-'
+  form.value.person.parent_fio = '-'
+  form.value.person.parent_tel = '999999999'
+  form.value.teamId = 1 // Устанавливаем ID группы
+}
 
 onMounted(() => {
   initForm()

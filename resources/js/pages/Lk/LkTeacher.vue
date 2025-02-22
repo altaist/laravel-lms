@@ -107,6 +107,17 @@
         />
       </div>
 
+      <!-- Все занятия -->
+      <div class="col-12 col-sm-3">
+        <q-btn
+          class="full-width"
+          color="blue-grey"
+          stack
+          label="Все занятия"
+          icon="fa fa-calendar-check"
+          @click="router.visit(route('activities.all'))"
+        />
+      </div>
       <!-- Расписание -->
       <div class="col-12 col-sm-3">
         <q-btn
@@ -130,6 +141,7 @@
           @click="router.visit(route('teacher.payments'))"
         />
       </div>
+
     </div>
 
     <!-- Ссылка Выйти -->

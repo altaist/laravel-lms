@@ -9,8 +9,10 @@ use App\Services\ActivityService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Team;
+use Inertia\Response;
 
-class ActivityController extends Controller
+class ActivityController extends BaseController
 {
     public function __construct(
         private readonly ActivityService $activityService
@@ -134,8 +136,6 @@ class ActivityController extends Controller
         return response()->json($activity);
     }
 
-
-
     /**
      * Завершить активность
      */
@@ -175,17 +175,15 @@ class ActivityController extends Controller
      */
     public function restart(int $id): JsonResponse
     {
-
-            $activity = $this->activityService->restartActivity($id);
-            
-            return response()->json([
-                'message' => 'Activity restarted successfully',
-                'activity' => $activity
-            ]);
-
+        $activity = $this->activityService->restartActivity($id);
+        
+        return response()->json([
+            'message' => 'Activity restarted successfully',
+            'activity' => $activity
+        ]);
     }
 
-        /**
+    /**
      * Добавить ученика к активности
      */
     public function addStudent(Request $request): JsonResponse
@@ -222,7 +220,7 @@ class ActivityController extends Controller
         return response()->json(['message' => 'Students added successfully']);
     }
 
-        /**
+    /**
      * Удалить ученика из активности
      */
     public function removeStudent(Request $request): JsonResponse
@@ -260,6 +258,20 @@ class ActivityController extends Controller
 
         return response()->json([
             'message' => 'Students removed successfully'
+        ]);
+    }
+
+    /**
+     * Показать страницу со всеми активностями
+     */
+    public function allActivities(): Response
+    {
+        $activities = Activity::with(['team'])->orderBy('starting_at', 'desc')->get();
+        $teams = Team::all();
+
+        return $this->inertia('Lk/AllActivities', [
+            'activities' => $activities,
+            'teams' => $teams
         ]);
     }
 } 
